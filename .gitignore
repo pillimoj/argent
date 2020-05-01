@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Intellij
+*.iml
+/.idea/*
+!/.idea/codeStyles
+out
+
+# Gradle
+.gradle
+/local.properties
+/build
+/deployments
+gradle.properties
+
+
+# client build
+resources/public
