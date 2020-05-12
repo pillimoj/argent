@@ -1,7 +1,0 @@
-{
-  "database": "argent",
-  "host": "localhost",
-  "user": "argent",
-  "password": "password",
-  "port": 5432
-}
