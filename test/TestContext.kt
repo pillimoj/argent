@@ -1,7 +1,7 @@
 import argent.api.ApiController
 import argent.checklists.ChecklistDataStore
 import argent.server.DataBases
-import argent.server.mainWithDeps
+import argent.server.main
 import argent.util.runMigrations
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.withTestApplication
@@ -12,14 +12,14 @@ interface ApplicationContext {
     val apiController: ApiController
     fun <T> testMain(callback: TestApplicationEngine.() -> T): T {
         return withTestApplication({
-            mainWithDeps(apiController)
+            main()
         }) { callback() }
     }
 }
 
 val DefaultApplicationContext = object: ApplicationContext {
     override val checklistDataStore = ChecklistDataStore(DataBases.Argent.database)
-    override val apiController = ApiController(checklistDataStore)
+    override val apiController = ApiController
 
     init {
         runMigrations(DataBases.Argent.dataSource)
@@ -27,7 +27,7 @@ val DefaultApplicationContext = object: ApplicationContext {
 }
 
 interface ApplicationTest {
-    fun <T> withAppContext(context: ApplicationContext = DefaultApplicationContext,block: suspend ApplicationContext.() -> T): T {
+    fun <T: Any> withAppContext(context: ApplicationContext = DefaultApplicationContext,block: suspend ApplicationContext.() -> T): T {
         return runBlocking { context.run { block() } }
     }
 

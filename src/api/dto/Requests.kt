@@ -17,3 +17,6 @@ data class ChecklistItemReq(
 
 @Serializable
 data class SetItemDoneReq(val done: Boolean)
+
+@Serializable
+data class DeleteItemsReq(val items: List<UUID>)

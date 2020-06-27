@@ -1,6 +1,5 @@
 package argent.server
 
-import argent.util.Dispatchers
 import argent.util.e
 import argent.util.logger
 import com.zaxxer.hikari.HikariConfig
@@ -37,14 +36,15 @@ private fun getDataSourceTcp(database:String, user: String, password: String, co
         e("host" to conf.host, "database" to database, "user" to user)
     )
     val config = HikariConfig().apply {
-        this.jdbcUrl = "jdbc:postgresql://${conf.host}:${conf.port}/${database}"
-        this.username = user
+        jdbcUrl = "jdbc:postgresql://${conf.host}:${conf.port}/${database}"
+        username = user
         this.password = password
-        this.maximumPoolSize = 2
-        this.minimumIdle = 2
-        this.connectionTimeout = 10000 // 10 seconds
-        this.idleTimeout = 600000 // 10 minutes
-        this.maxLifetime = 1800000 // 30 minutes
+        maximumPoolSize = 2
+        minimumIdle = 2
+        connectionTimeout = 10000 // 10 seconds
+        idleTimeout = 600000 // 10 minutes
+        maxLifetime = 1800000 // 30 minutes
+        driverClassName = "org.postgresql.Driver"
     }
     return HikariDataSource(config)
 }
@@ -71,7 +71,7 @@ private fun getDataSourceCloudSql(database:String, user: String, password: Strin
 }
 
 suspend fun <T> Database.transaction(block: Transaction.() -> T): T {
-    return suspendedTransactionAsync(Dispatchers.DB, db = this) {
+    return suspendedTransactionAsync(kotlinx.coroutines.Dispatchers.IO, db = this) {
         block()
     }.await()
 }

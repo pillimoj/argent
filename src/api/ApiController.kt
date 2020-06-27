@@ -3,10 +3,12 @@ package argent.api
 import argent.api.dto.ChecklistItemReq
 import argent.api.dto.ChecklistItemRes
 import argent.api.dto.ChecklistReq
+import argent.api.dto.DeleteItemsReq
 import argent.api.dto.IAPUser
 import argent.api.dto.SetItemDoneReq
 import argent.checklists.ChecklistDataStore
 import argent.server.BadRequestException
+import argent.server.DataBases
 import argent.util.e
 import argent.util.logger
 import argent.util.pathParam
@@ -32,12 +34,14 @@ fun handler(method: HttpMethod, block: RouteHandler): RouteHandler = {
     block(Unit)
 }
 
-class ApiController(store: ChecklistDataStore) {
+private val store = ChecklistDataStore(DataBases.Argent.database)
+
+object ApiController {
     val user = handler(HttpMethod.Get) {
         call.respond(IAPUser("user@argent", "123"))
     }
 
-    class Checklists(private val store: ChecklistDataStore) {
+    object Checklists {
         val create = handler(HttpMethod.Post) {
             val req = call.receive<ChecklistReq>()
             val res = store.addChecklist(req)
@@ -60,9 +64,21 @@ class ApiController(store: ChecklistDataStore) {
             val res = store.getChecklistWithItems(id)
             call.respond(res)
         }
+
+        val deleteItems = handler(HttpMethod.Delete){
+            val deleteItemsReq = call.receive<DeleteItemsReq>()
+            store.deleteItems(deleteItemsReq.items)
+            call.respond(OkResponse)
+        }
+
+        val clearDone = handler(HttpMethod.Post){
+            val id = pathParam()
+            store.clearDone(id)
+            call.respond(OkResponse)
+        }
     }
 
-    class ChecklistItems(private val store: ChecklistDataStore) {
+    object ChecklistItems {
         val create = handler(HttpMethod.Post) {
             val req = call.receive<ChecklistItemReq>()
             if(!store.hasChecklist(req.checklist)) throw BadRequestException("No checklist with that id")
@@ -84,9 +100,6 @@ class ApiController(store: ChecklistDataStore) {
             call.respond(OkResponse)
         }
     }
-
-    val checklists = Checklists(store)
-    val checklistItems = ChecklistItems(store)
 }
 
 object UtilController {

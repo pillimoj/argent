@@ -1,7 +1,6 @@
 package argent.server.features
 
-import argent.ArgentDependencies
-import argent.api.apiRoutes
+import argent.api.v1Routes
 import io.ktor.application.Application
 import io.ktor.routing.route
 import io.ktor.routing.routing
@@ -9,7 +8,7 @@ import io.ktor.routing.routing
 object ApiV1Routes : Feature {
     override val installer: Application.() -> Unit = {
         routing {
-            route("api/v1") { apiRoutes(ArgentDependencies.controller) }
+            route("api/v1") { v1Routes() }
         }
     }
 }

@@ -9,6 +9,8 @@ import argent.api.dto.ChecklistWithItemsRes
 import argent.server.transaction
 import argent.util.toGMTDate
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -69,6 +71,18 @@ class ChecklistDataStore(private val db: Database) {
     suspend fun deleteChecklist(id: UUID) {
         db.transaction {
             Checklist[id].delete()
+        }
+    }
+
+    suspend fun deleteItems(items: List<UUID>){
+        db.transaction {
+            ChecklistItems.deleteWhere{ChecklistItems.id inList items}
+        }
+    }
+
+    suspend fun clearDone(id: UUID){
+        db.transaction {
+            ChecklistItems.deleteWhere{ChecklistItems.checklist eq id and (ChecklistItems.done eq true)}
         }
     }
 }
