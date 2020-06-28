@@ -14,7 +14,7 @@ buildproductionimage:
 	./gradlew jib -PjibImage=${IMAGE} -PgitHash=${TAG} --stacktrace
 
 rundocker: buildlocalimage
-    $(eval IMAGE_DIGEST := $(shell jq -r .image build/jib-image.json)@$(shell cat build/jib-image.digest))
+	$(eval IMAGE_DIGEST := $(shell jq -r .image build/jib-image.json)@$(shell cat build/jib-image.digest)) \
 	docker run -t \
 	--env-file .env \
 	-v ${PWD}/localdockersecrets:/localsecrets \
@@ -22,5 +22,5 @@ rundocker: buildlocalimage
 	${IMAGE_DIGEST}  | node logparse.js
 
 deploy: buildproductionimage
-    $(eval IMAGE_DIGEST := $(shell jq -r .image build/jib-image.json)@$(shell cat build/jib-image.digest))
+	$(eval IMAGE_DIGEST := $(shell jq -r .image build/jib-image.json)@$(shell cat build/jib-image.digest))
 	gcloud run deploy argent --image=${IMAGE_DIGEST}

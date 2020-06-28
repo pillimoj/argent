@@ -4,6 +4,8 @@ import argent.google.accessSecretVersion
 import argent.util.argentJson
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.builtins.serializer
 import java.io.File
 
 class ConfigurationError(configKey: String) : Exception("Missing configuration: $configKey")
@@ -62,6 +64,5 @@ object Config {
         else getSecretConf(DbConf.serializer(), "argent-db")
     }
 
-    //val IAPExpectedAud = getConfig("ARGENT_IAP_EXPECTED_AUD")
-    // val mockAuth = getConfig("ARGENT_MOCK_AUTH", "false") == "true"
+    val authenticatedEmails = getSecretConf(ListSerializer(String.serializer()), "authenticated-emails")
 }

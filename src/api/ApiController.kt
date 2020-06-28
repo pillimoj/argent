@@ -4,18 +4,20 @@ import argent.api.dto.ChecklistItemReq
 import argent.api.dto.ChecklistItemRes
 import argent.api.dto.ChecklistReq
 import argent.api.dto.DeleteItemsReq
-import argent.api.dto.IAPUser
 import argent.api.dto.SetItemDoneReq
 import argent.checklists.ChecklistDataStore
 import argent.server.BadRequestException
 import argent.server.DataBases
-import argent.util.e
+import argent.server.InternalServerError
+import argent.server.features.User
+import argent.util.extra
 import argent.util.logger
 import argent.util.pathParam
 import argent.util.requireMethod
 import argent.util.toGMTDate
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
+import io.ktor.auth.principal
 import io.ktor.http.HttpMethod
 import io.ktor.request.receive
 import io.ktor.response.respond
@@ -37,8 +39,9 @@ fun handler(method: HttpMethod, block: RouteHandler): RouteHandler = {
 private val store = ChecklistDataStore(DataBases.Argent.database)
 
 object ApiController {
-    val user = handler(HttpMethod.Get) {
-        call.respond(IAPUser("user@argent", "123"))
+    val me = handler(HttpMethod.Get) {
+        val principal = call.principal<User>() ?: throw InternalServerError("No principal in api handler")
+        call.respond(principal)
     }
 
     object Checklists {
@@ -55,6 +58,7 @@ object ApiController {
         }
 
         val getAll = handler(HttpMethod.Get) {
+            val wife = call.principal<User>()
             val checklists = store.getChecklists()
             call.respond(checklists)
         }
@@ -94,7 +98,7 @@ object ApiController {
 
         val setDone = handler(HttpMethod.Post) {
             val id = pathParam()
-            logger.info("Set item done", e("id" to id))
+            logger.info("Set item done", extra("id" to id))
             val done = call.receive<SetItemDoneReq>().done
             store.setItemDone(id, done)
             call.respond(OkResponse)

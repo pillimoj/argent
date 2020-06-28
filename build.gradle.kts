@@ -49,6 +49,8 @@ dependencies {
     // Ktor
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-serialization:$ktorVersion")
+    implementation("io.ktor:ktor-auth:$ktorVersion")
+    implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
 
     // Json
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
@@ -71,6 +73,9 @@ dependencies {
     implementation("com.google.cloud:google-cloud-secretmanager:1.0.0")
     implementation("com.google.cloud.sql:postgres-socket-factory:1.0.16")
 
+    // JWT
+    implementation("com.auth0:java-jwt:3.9.0")
+    implementation("com.auth0:jwks-rsa:0.12.0")
 
     // Tests
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")

@@ -1,6 +1,6 @@
 package argent.server
 
-import argent.util.e
+import argent.util.extra
 import argent.util.logger
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -33,7 +33,7 @@ private fun getDataSourceTcp(database:String, user: String, password: String, co
     val logger = DataBases.logger
     logger.info(
         "Connecting to db",
-        e("host" to conf.host, "database" to database, "user" to user)
+        extra("host" to conf.host, "database" to database, "user" to user)
     )
     val config = HikariConfig().apply {
         jdbcUrl = "jdbc:postgresql://${conf.host}:${conf.port}/${database}"
@@ -53,7 +53,7 @@ private fun getDataSourceCloudSql(database:String, user: String, password: Strin
     val logger = DataBases.logger
     logger.info(
         "Connecting to db",
-        e("instance" to conf.connectionName, "database" to database, "user" to user)
+        extra("instance" to conf.connectionName, "database" to database, "user" to user)
     )
     val config = HikariConfig().apply {
         this.jdbcUrl = "jdbc:postgresql:///${database}"
@@ -80,7 +80,7 @@ object QueryLogger : SqlLogger {
     override fun log (context: StatementContext, transaction: Transaction) {
             DataBases.Argent.queryLogger.debug(
                 "Querying argent db",
-                e("query" to context.expandArgs(TransactionManager.current()))
+                extra("query" to context.expandArgs(TransactionManager.current()))
             )
     }
 }
