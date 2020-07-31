@@ -64,5 +64,8 @@ object Config {
         else getSecretConf(DbConf.serializer(), "argent-db")
     }
 
-    val authenticatedEmails = getSecretConf(ListSerializer(String.serializer()), "authenticated-emails")
+    val authenticatedEmails by lazy {
+        if(debug) getDevConf(ListSerializer(String.serializer()), "authenticated-emails")
+        else getSecretConf(ListSerializer(String.serializer()), "authenticated-emails")
+    }
 }

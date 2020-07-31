@@ -98,8 +98,7 @@ jib {
             "-XX:MaxGCPauseMillis=100",
             "-XX:+UseStringDeduplication",
             "-Xmx128m",
-            "-Xms128m",
-            "-XX:MaxRAMPercentage=40.0"
+            "-Xms128m"
         )
     }
     to {
