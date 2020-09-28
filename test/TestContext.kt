@@ -31,7 +31,7 @@ interface ApplicationTest {
         return runBlocking { context.run { block() } }
     }
 
-    fun <T> testApp(context: ApplicationContext = DefaultApplicationContext,block: suspend ApplicationContext.() -> T): Unit {
+    fun <T> testApp(context: ApplicationContext = DefaultApplicationContext,block: suspend ApplicationContext.() -> T) {
         runBlocking { context.run { block() } }
     }
 }

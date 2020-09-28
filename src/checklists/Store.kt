@@ -70,13 +70,8 @@ class ChecklistDataStore(private val db: Database) {
 
     suspend fun deleteChecklist(id: UUID) {
         db.transaction {
+            ChecklistItems.deleteWhere{ChecklistItems.checklist eq id}
             Checklist[id].delete()
-        }
-    }
-
-    suspend fun deleteItems(items: List<UUID>){
-        db.transaction {
-            ChecklistItems.deleteWhere{ChecklistItems.id inList items}
         }
     }
 

@@ -7,6 +7,7 @@ import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlLogger
 import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.statements.StatementContext
 import org.jetbrains.exposed.sql.statements.expandArgs
 import org.jetbrains.exposed.sql.transactions.TransactionManager
@@ -72,6 +73,7 @@ private fun getDataSourceCloudSql(database:String, user: String, password: Strin
 
 suspend fun <T> Database.transaction(block: Transaction.() -> T): T {
     return suspendedTransactionAsync(kotlinx.coroutines.Dispatchers.IO, db = this) {
+        addLogger(QueryLogger)
         block()
     }.await()
 }

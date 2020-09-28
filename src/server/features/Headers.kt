@@ -1,6 +1,5 @@
-package argent.features
+package argent.server.features
 
-import argent.server.features.Feature
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.HSTS

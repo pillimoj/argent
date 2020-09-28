@@ -20,6 +20,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.request.header
 import kotlinx.serialization.Serializable
 
+@Suppress("unused")
 @Serializable
 class User(
     val email: String,
@@ -46,7 +47,7 @@ fun Authentication.Configuration.googleAuthJwt(
             val token = call.request.header(HttpHeaders.Authorization)?.replace("Bearer ", "")
             val payload = token?.let { TokenVerification.verify(token) }
             val principal = payload
-                ?.let { argentJson.parse(User.serializer(), payload) }
+                ?.let { argentJson.decodeFromString(User.serializer(), payload) }
                 ?: throw UnauthorizedException()
 
             if(principal.email !in Config.authenticatedEmails) throw ForbiddenException()

@@ -3,7 +3,6 @@ package argent.api
 import argent.api.dto.ChecklistItemReq
 import argent.api.dto.ChecklistItemRes
 import argent.api.dto.ChecklistReq
-import argent.api.dto.DeleteItemsReq
 import argent.api.dto.SetItemDoneReq
 import argent.checklists.ChecklistDataStore
 import argent.server.BadRequestException
@@ -44,6 +43,15 @@ object ApiController {
         call.respond(principal)
     }
 
+    val headers = handler(HttpMethod.Get) {
+        val headers = call.request.headers
+            .entries()
+            .asSequence()
+            .map { it.key to it.value }
+            .toMap()
+        call.respond(headers)
+    }
+
     object Checklists {
         val create = handler(HttpMethod.Post) {
             val req = call.receive<ChecklistReq>()
@@ -58,7 +66,6 @@ object ApiController {
         }
 
         val getAll = handler(HttpMethod.Get) {
-            val wife = call.principal<User>()
             val checklists = store.getChecklists()
             call.respond(checklists)
         }
@@ -67,12 +74,6 @@ object ApiController {
             val id = pathParam()
             val res = store.getChecklistWithItems(id)
             call.respond(res)
-        }
-
-        val deleteItems = handler(HttpMethod.Delete){
-            val deleteItemsReq = call.receive<DeleteItemsReq>()
-            store.deleteItems(deleteItemsReq.items)
-            call.respond(OkResponse)
         }
 
         val clearDone = handler(HttpMethod.Post){
@@ -109,10 +110,6 @@ object ApiController {
 object UtilController {
     val ping = handler(HttpMethod.Get) {
         call.respond("Pong")
-    }
-
-    val fail = handler(HttpMethod.Get) {
-        throw Exception("Fail requested")
     }
 
     val healthCheck = handler(HttpMethod.Get) {

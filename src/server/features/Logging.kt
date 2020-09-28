@@ -1,6 +1,5 @@
-package argent.features
+package argent.server.features
 
-import argent.server.features.Feature
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.CallId
@@ -9,7 +8,7 @@ import io.ktor.features.callIdMdc
 import io.ktor.http.HttpHeaders
 import io.ktor.request.header
 import org.slf4j.event.Level
-import java.util.*
+import java.util.UUID
 
 object Logging: Feature {
     override val installer: Application.() -> Unit = {

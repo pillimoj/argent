@@ -15,20 +15,15 @@ fun getConfig(configKey: String, default: String? = null): String {
     return strValue ?: default ?: throw ConfigurationError("Missing configuration $configKey")
 }
 
-fun getOptionalConfig(configKey: String): String? {
-    val strValue = System.getenv(configKey)
-    return strValue ?: null
-}
-
 fun <T> getSecretConf(serializer: DeserializationStrategy<T>, name: String): T {
     val configJsonString = accessSecretVersion(Config.googleProject, name)
-    return argentJson.parse(serializer, configJsonString)
+    return argentJson.decodeFromString(serializer, configJsonString)
 }
 
 fun <T> getDevConf(serializer: DeserializationStrategy<T>, name: String): T {
     val localSecretsPath = getConfig("ARGENT_DEV_LOCAL_SECRETS_PATH")
     val configJsonString = File("$localSecretsPath/$name.json").readText()
-    return argentJson.parse(serializer, configJsonString)
+    return argentJson.decodeFromString(serializer, configJsonString)
 }
 
 @Serializable
@@ -54,7 +49,7 @@ data class TCPDbConf(
 object Config {
 
     val port = getConfig("PORT", "8080").toInt()
-    val debug = getConfig("ARGENT_DEBUG", "false") == "true"
+    private val debug = getConfig("ARGENT_DEBUG", "false") == "true"
     val watchPaths = if (debug) listOf("argent") else emptyList()
 
     val googleProject = getConfig("GOOGLE_CLOUD_PROJECT")

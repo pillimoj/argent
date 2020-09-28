@@ -30,8 +30,3 @@ data class ChecklistItemRes(
 
 @Serializable
 data class ErrorMessage(val error: String)
-
-@Serializable
-object OkResponse {
-    val message = "OK"
-}

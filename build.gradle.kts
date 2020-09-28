@@ -1,13 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("plugin.serialization") version "1.3.72"
-    kotlin("jvm") version "1.3.72"
-    id("com.google.cloud.tools.jib") version "2.2.0"
+    kotlin("plugin.serialization") version "1.4.0"
+    kotlin("jvm") version "1.4.0"
+    id("com.google.cloud.tools.jib") version "2.5.0"
     application
 }
 
-val ktorVersion = "1.3.2"
+val ktorVersion = "1.4.0"
 val argentMainClass = "argent.MainKt"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -53,7 +53,7 @@ dependencies {
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
 
     // Json
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.2.3")
@@ -85,8 +85,7 @@ dependencies {
 }
 
 jib {
-    // Use digest to make builds reproducible. gcr.io/distroless/java:8 @ 2020-04-09 00:49B
-    from.image = "gcr.io/distroless/java@sha256:e99eb6cf88ca2df69e99bf853d65f125066730e3e9f7a233bd1b7e3523c144cb"
+    from.image = "gcr.io/distroless/java:11"
     container {
         ports = listOf("80")
         mainClass = argentMainClass
@@ -121,7 +120,7 @@ tasks.getByName<JavaExec>("run") {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
 
 fun getEnvVariables(): Map<String, String> {

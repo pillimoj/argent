@@ -9,5 +9,6 @@ fun extra(vararg keyValues: Pair<String,Any?>): StructuredArgument? {
     return StructuredArguments.entries(keyValues.toMap().mapValues { (_, v) -> v.toString() })
 }
 
+@Suppress("unused")
 inline val <reified T> T.logger: Logger
     get() = LoggerFactory.getLogger(T::class.java)

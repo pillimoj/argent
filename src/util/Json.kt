@@ -1,9 +1,10 @@
 package argent.util
 
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 
-val argentJson = Json(JsonConfiguration.Stable.copy(ignoreUnknownKeys = true))
+val argentJson = Json{
+    ignoreUnknownKeys = true
+}
 /*
 
 @ImplicitReflectionSerializer
