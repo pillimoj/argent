@@ -71,7 +71,7 @@ private fun getDataSourceCloudSql(database:String, user: String, password: Strin
     return HikariDataSource(config)
 }
 
-suspend fun <T> Database.transaction(block: Transaction.() -> T): T {
+suspend fun <T> Database.transaction(block: suspend Transaction.() -> T): T {
     return suspendedTransactionAsync(kotlinx.coroutines.Dispatchers.IO, db = this) {
         addLogger(QueryLogger)
         block()
