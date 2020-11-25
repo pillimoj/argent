@@ -1,13 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("plugin.serialization") version "1.4.0"
-    kotlin("jvm") version "1.4.0"
+    kotlin("plugin.serialization") version "1.4.10"
+    kotlin("jvm") version "1.4.10"
     id("com.google.cloud.tools.jib") version "2.5.0"
     application
 }
 
-val ktorVersion = "1.4.0"
+val ktorVersion = "1.4.1"
 val argentMainClass = "argent.MainKt"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -48,25 +48,22 @@ dependencies {
 
     // Ktor
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-server-jetty:$ktorVersion")
     implementation("io.ktor:ktor-serialization:$ktorVersion")
     implementation("io.ktor:ktor-auth:$ktorVersion")
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
 
     // Json
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("net.logstash.logback:logstash-logback-encoder:6.3")
 
     // Database
-    val exposedVersion = "0.20.2"
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
-    implementation("com.zaxxer:HikariCP:3.4.2")
-    implementation("org.postgresql:postgresql:42.2.2")
+    implementation("com.zaxxer:HikariCP:3.4.5")
+    implementation("org.postgresql:postgresql:42.2.18")
     implementation("org.flywaydb:flyway-core:6.2.4")
 
     // Google
@@ -74,8 +71,8 @@ dependencies {
     implementation("com.google.cloud.sql:postgres-socket-factory:1.0.16")
 
     // JWT
-    implementation("com.auth0:java-jwt:3.9.0")
-    implementation("com.auth0:jwks-rsa:0.12.0")
+    implementation("com.auth0:java-jwt:3.11.0")
+    implementation("com.auth0:jwks-rsa:0.14.1")
 
     // Tests
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")

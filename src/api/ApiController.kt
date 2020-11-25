@@ -1,118 +1,103 @@
 package argent.api
 
-import argent.api.dto.ChecklistItemReq
-import argent.api.dto.ChecklistItemRes
-import argent.api.dto.ChecklistReq
-import argent.api.dto.SetItemDoneReq
-import argent.checklists.ChecklistDataStore
+import argent.data.checklists.Checklist
+import argent.data.checklists.ChecklistAccessType
+import argent.data.checklists.ChecklistDataStore
+import argent.data.checklists.ChecklistItem
+import argent.data.users.User
+import argent.data.users.UserDataStore
+import argent.data.users.UserRole
 import argent.server.BadRequestException
 import argent.server.DataBases
-import argent.server.InternalServerError
-import argent.server.features.User
-import argent.util.extra
-import argent.util.logger
-import argent.util.pathParam
-import argent.util.requireMethod
-import argent.util.toGMTDate
-import io.ktor.application.ApplicationCall
+import argent.server.ForbiddenException
+import argent.util.pathIdParam
 import io.ktor.application.call
-import io.ktor.auth.principal
 import io.ktor.http.HttpMethod
-import io.ktor.request.receive
 import io.ktor.response.respond
-import io.ktor.util.pipeline.PipelineContext
-import kotlinx.serialization.Serializable
+import java.util.UUID
 
-typealias RouteHandler = suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit
-
-@Serializable
-data class MessageResponse(val message: String)
-
-val OkResponse = MessageResponse("OK")
-
-fun handler(method: HttpMethod, block: RouteHandler): RouteHandler = {
-    requireMethod(method)
-    block(Unit)
-}
-
-private val store = ChecklistDataStore(DataBases.Argent.database)
+private val checklistDataStore = ChecklistDataStore(DataBases.Argent.dbPool)
+private val userDataStore = UserDataStore(DataBases.Argent.dbPool)
 
 object ApiController {
-    val me = handler(HttpMethod.Get) {
-        val principal = call.principal<User>() ?: throw InternalServerError("No principal in api handler")
-        call.respond(principal)
+    val me = authedHandler(HttpMethod.Get) { user ->
+        call.respond(user)
     }
 
-    val headers = handler(HttpMethod.Get) {
-        val headers = call.request.headers
-            .entries()
-            .asSequence()
-            .map { it.key to it.value }
-            .toMap()
-        call.respond(headers)
+    suspend fun isOwner(checklistId: UUID, user: User): Boolean {
+        return user.role == UserRole.Admin || checklistDataStore.getAccessType(
+            checklistId,
+            user
+        ) == ChecklistAccessType.Owner
+    }
+
+    suspend fun hasAccess(checklistId: UUID, user: User): Boolean {
+        return checklistDataStore.getAccessType(checklistId, user) != null
     }
 
     object Checklists {
-        val create = handler(HttpMethod.Post) {
-            val req = call.receive<ChecklistReq>()
-            val res = store.addChecklist(req)
-            call.respond(res)
+        val create = authedHandler(HttpMethod.Post) { user ->
+            val checklist = Checklist.marshall(call)
+            checklistDataStore.addChecklist(checklist, user)
+            call.respond(checklist)
         }
 
-        val delete= handler(HttpMethod.Delete) {
-            val id = pathParam()
-            store.deleteChecklist(id)
+        val delete = authedHandler(HttpMethod.Delete) { user ->
+            val id = pathIdParam()
+            if (!isOwner(id, user)) {
+                throw ForbiddenException()
+            }
+            checklistDataStore.deleteChecklist(id)
             call.respond(OkResponse)
         }
 
-        val getAll = handler(HttpMethod.Get) {
-            val checklists = store.getChecklists()
+        val getAll = authedHandler(HttpMethod.Get) { user ->
+            val checklists = checklistDataStore.getChecklistsForUser(user)
             call.respond(checklists)
         }
 
-        val get = handler(HttpMethod.Get) {
-            val id = pathParam()
-            val res = store.getChecklistWithItems(id)
-            call.respond(res)
+        val getItems = authedHandler(HttpMethod.Get) { user ->
+            val id = pathIdParam()
+            if (!hasAccess(id, user)) {
+                throw ForbiddenException()
+            }
+            val items = checklistDataStore.getChecklistItems(id)
+            call.respond(items)
         }
 
-        val clearDone = handler(HttpMethod.Post){
-            val id = pathParam()
-            store.clearDone(id)
+        val clearDone = authedHandler(HttpMethod.Post) { user ->
+            val id = pathIdParam()
+            if (!hasAccess(id, user)) {
+                throw ForbiddenException()
+            }
+            checklistDataStore.clearDone(id)
             call.respond(OkResponse)
         }
     }
 
     object ChecklistItems {
-        val create = handler(HttpMethod.Post) {
-            val req = call.receive<ChecklistItemReq>()
-            if(!store.hasChecklist(req.checklist)) throw BadRequestException("No checklist with that id")
-            val res = store.addItem(req)
-            call.respond(ChecklistItemRes(res.id.value, res.title, res.done, res.createdAt.toGMTDate()))
-        }
-
-        val delete = handler(HttpMethod.Delete){
-            val id = pathParam()
-            store.deleteItem(id)
+        val create = authedHandler(HttpMethod.Post) { user ->
+            val item = ChecklistItem.marshall(call)
+            if (!hasAccess(item.checklist, user)) throw ForbiddenException()
+            checklistDataStore.addItem(item)
             call.respond(OkResponse)
         }
 
-        val setDone = handler(HttpMethod.Post) {
-            val id = pathParam()
-            logger.info("Set item done", extra("id" to id))
-            val done = call.receive<SetItemDoneReq>().done
-            store.setItemDone(id, done)
-            call.respond(OkResponse)
+        val setDone = authedHandler(HttpMethod.Put) { user ->
+            setItemStatus(this, user, true)
         }
-    }
-}
+        val setNotDone = authedHandler(HttpMethod.Put) { user ->
+            setItemStatus(this, user, false)
+        }
 
-object UtilController {
-    val ping = handler(HttpMethod.Get) {
-        call.respond("Pong")
-    }
-
-    val healthCheck = handler(HttpMethod.Get) {
-        call.respond("OK")
+        private suspend fun setItemStatus(callContext: CallContext, user: User, done: Boolean){
+            val id = callContext.pathIdParam()
+            val item = checklistDataStore.getItem(id)
+            if(item == null || !hasAccess(item.checklist, user)){
+                throw BadRequestException()
+            }
+            checklistDataStore.setItemDone(id, done)
+            callContext.call.respond(OkResponse)
+        }
     }
 }

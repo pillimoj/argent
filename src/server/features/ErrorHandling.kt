@@ -1,6 +1,6 @@
 package argent.server.features
 
-import argent.api.dto.ErrorMessage
+import argent.api.ErrorMessage
 import argent.server.ApiException
 import argent.server.InternalServerError
 import argent.util.logger

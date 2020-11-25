@@ -11,11 +11,10 @@ import io.ktor.server.netty.Netty
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-
 fun main() {
     Config // Initialize
     val logger: Logger = LoggerFactory.getLogger("argent")
-    runMigrations(DataBases.Argent.dataSource)
+    runMigrations(DataBases.Argent.dbPool)
 
     val server =
         embeddedServer(

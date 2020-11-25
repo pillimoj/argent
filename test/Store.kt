@@ -1,12 +1,13 @@
 import argent.api.dto.ChecklistItemReq
 import argent.api.dto.ChecklistReq
+import argent.data.checklists.Checklist
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class StoreTest : ApplicationTest {
     @Test
     fun seedDatabase() = testApp {
-        val cl1 = checklistDataStore.addChecklist(ChecklistReq(Faker.elderScrolls().city()))
+        val cl1 = checklistDataStore.addChecklist(Checklist(,Faker.elderScrolls().city()))
         val cl2 = checklistDataStore.addChecklist(ChecklistReq(Faker.elderScrolls().city()))
         (1..10).map {
             checklistDataStore.addItem(ChecklistItemReq(cl1.id, Faker.elderScrolls().dragon()))

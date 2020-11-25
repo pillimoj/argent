@@ -1,5 +1,5 @@
 import argent.api.ApiController
-import argent.checklists.ChecklistDataStore
+import argent.data.checklists.ChecklistDataStore
 import argent.server.DataBases
 import argent.server.main
 import argent.util.runMigrations

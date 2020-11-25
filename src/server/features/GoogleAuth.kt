@@ -1,9 +1,10 @@
 package argent.server.features
 
-
+import argent.data.users.User
+import argent.data.users.UserDataStore
 import argent.google.TokenVerification
 import argent.server.ApiException
-import argent.server.Config
+import argent.server.DataBases
 import argent.server.ForbiddenException
 import argent.server.UnauthorizedException
 import argent.util.argentJson
@@ -15,23 +16,23 @@ import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.AuthenticationPipeline
 import io.ktor.auth.AuthenticationProvider
-import io.ktor.auth.Principal
 import io.ktor.http.HttpHeaders
 import io.ktor.request.header
 import kotlinx.serialization.Serializable
 
-@Suppress("unused")
 @Serializable
-class User(
+class GoogleToken(
     val email: String,
     val given_name: String,
-    val family_name: String
-): Principal
+    val family_name: String,
+)
 
 class GoogleAuthProvider internal constructor(
     configuration: Configuration
 ) : AuthenticationProvider(configuration) {
     // internal val confValue: String = configuration.confValue
+    internal val usersStore = UserDataStore(DataBases.Argent.dbPool)
+
     class Configuration internal constructor(name: String?) : AuthenticationProvider.Configuration(name) {
         // var confValue: String = "some valuer"
     }
@@ -46,20 +47,19 @@ fun Authentication.Configuration.googleAuthJwt(
         try {
             val token = call.request.header(HttpHeaders.Authorization)?.replace("Bearer ", "")
             val payload = token?.let { TokenVerification.verify(token) }
-            val principal = payload
-                ?.let { argentJson.decodeFromString(User.serializer(), payload) }
+            val googleToken = payload
+                ?.let { argentJson.decodeFromString(GoogleToken.serializer(), payload) }
                 ?: throw UnauthorizedException()
 
-            if(principal.email !in Config.authenticatedEmails) throw ForbiddenException()
-
-            context.principal(principal)
+            val user: User = provider.usersStore.getUserForEmail(googleToken.email)
+                ?: throw ForbiddenException()
+            context.principal(user)
             return@intercept
-        }
-        catch (e: Exception){
-            if(e is ApiException){
+        } catch (e: Exception) {
+            if (e is ApiException) {
                 throw e
             }
-            if(e is JWTVerificationException){
+            if (e is JWTVerificationException) {
                 logger.info("Could not verify google token", e)
                 throw UnauthorizedException()
             }
@@ -70,10 +70,10 @@ fun Authentication.Configuration.googleAuthJwt(
     register(provider)
 }
 
-object GoogleAuthFeature: Feature {
+object GoogleAuthFeature : Feature {
     override val installer: Application.() -> Unit = {
-        install(Authentication){
-            googleAuthJwt {  }
+        install(Authentication) {
+            googleAuthJwt { }
         }
     }
 }
