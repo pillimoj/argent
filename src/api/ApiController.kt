@@ -83,10 +83,10 @@ object ApiController {
             call.respond(OkResponse)
         }
 
-        val setDone = authedHandler(HttpMethod.Put) { user ->
+        val setDone = authedHandler(HttpMethod.Post) { user ->
             setItemStatus(this, user, true)
         }
-        val setNotDone = authedHandler(HttpMethod.Put) { user ->
+        val setNotDone = authedHandler(HttpMethod.Post) { user ->
             setItemStatus(this, user, false)
         }
 

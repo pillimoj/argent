@@ -40,7 +40,7 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
     suspend fun getChecklistItems(checklistId: UUID): List<ChecklistItem> {
         return db.asyncConnection {
             executeQuery("""
-                SELECT id, title, done, created_at
+                SELECT id, title, done, created_at, checklist
                 FROM checklistitems
                 WHERE checklist = ?
             """.trimIndent(),
@@ -76,9 +76,8 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
             """.trimIndent(),
                     listOf(checklist.id, checklist.name)
                 )
-            }
-            executeUpdate(
-                """
+                executeUpdate(
+                    """
                 INSERT INTO checklist_access (
                     checklist,
                     argent_user,
@@ -86,12 +85,13 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                 )
                 VALUES(?,?,?)
             """.trimIndent(),
-                listOf(
-                    checklist.id,
-                    user.id,
-                    ChecklistAccessType.Owner
+                    listOf(
+                        checklist.id,
+                        user.id,
+                        ChecklistAccessType.Owner
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -102,12 +102,13 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                     id,
                     title,
                     done,
-                    create_at
+                    created_at,
+                    checklist
                 FROM checklistitems
                 WHERE id = ?
             """.trimIndent(),
-            listOf(itemId),
-            parse { ChecklistItem(it) })
+                listOf(itemId),
+                parse { ChecklistItem(it) })
         }
     }
 
@@ -144,18 +145,6 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                 WHERE id = ?
             """.trimIndent(),
                 listOf(isDone, checklistItemId)
-            )
-        }
-    }
-
-    suspend fun deleteItem(checklistItemId: UUID) {
-        db.asyncConnection {
-            executeUpdate(
-                """
-                DELETE checklistitems
-                WHERE id = ?
-            """.trimIndent(),
-                listOf(checklistItemId)
             )
         }
     }
@@ -201,13 +190,11 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                 SELECT access_type
                 FROM checklist_access
                 WHERE checklist = ?
-                AND user = ?
-                AND access_type = ?
+                AND argent_user = ?
             """.trimIndent(),
                 listOf(
                     checklistId,
                     user.id,
-                    ChecklistAccessType.Owner
                 ),
                 parse { it.getString("access_type").asEnum<ChecklistAccessType>() },
             )

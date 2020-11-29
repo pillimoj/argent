@@ -10,7 +10,7 @@ import io.ktor.routing.route
 fun Route.v1Routes() {
     authenticate {
         get("me", ApiController.me)
-        route("api/data/checklists") {
+        route("checklists") {
             post(ApiController.Checklists.create)
             get(ApiController.Checklists.getAll)
             route("{id}") {

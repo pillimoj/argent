@@ -3,12 +3,11 @@ CREATE TABLE IF NOT EXISTS argent_users
     id    UUID PRIMARY KEY,
     name  TEXT      NOT NULL,
     email TEXT      NOT NULL,
-    role  TIMESTAMP NOT NULL
+    role  TEXT      NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS checklist_access
 (
-    id          UUID NOT NULL,
     checklist   UUID NOT NULL,
     argent_user UUID NOT NULL,
     access_type TEXT NOT NULL,

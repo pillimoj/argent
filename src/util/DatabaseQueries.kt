@@ -1,5 +1,6 @@
 package argent.util
 
+import io.ktor.util.date.GMTDate
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -22,11 +23,12 @@ interface DatabaseQueries {
         is UUIDArray -> setArray(position, connection.createArrayOf("uuid", arg.uuids.toTypedArray()))
         is String -> setString(position, arg)
         is Double -> setDouble(position, arg)
-        is OffsetDateTime -> setObject(position, arg)
+        is LocalDateTime -> setObject(position, arg)
         is LocalTime -> setObject(position, arg)
         is UUID -> setObject(position, arg)
         is Int -> setInt(position, arg)
         is Long -> setLong(position, arg)
+        is Boolean -> setBoolean(position, arg)
         is Enum<*> -> setString(position, arg.name)
         else -> {
             if (arg == null) {
