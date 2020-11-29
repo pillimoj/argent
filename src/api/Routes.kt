@@ -26,5 +26,9 @@ fun Route.v1Routes() {
                 post("not-done", ApiController.ChecklistItems.setNotDone)
             }
         }
+
+        route("admin"){
+            get("users", AdminController.getAllUsers)
+        }
     }
 }

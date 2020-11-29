@@ -21,7 +21,7 @@ INSERT INTO argent_users
 )
 VALUES (
     '7E67AF10-FD10-48B9-B05A-D3AB18B52E50',
-    'Eric',
-    'eric.o.berglund@gmail.com',
+    'Sylvia',
+    'sylvia.rynell@gmail.com',
     'Admin'
 );
