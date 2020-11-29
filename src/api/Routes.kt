@@ -10,12 +10,11 @@ import io.ktor.routing.route
 fun Route.v1Routes() {
     authenticate {
         get("me", ApiController.me)
-        get("headers", ApiController.headers)
         route("checklists") {
             post(ApiController.Checklists.create)
             get(ApiController.Checklists.getAll)
             route("{id}") {
-                get(ApiController.Checklists.get)
+                get(ApiController.Checklists.getItems)
                 delete(ApiController.Checklists.delete)
                 post("clear-done", ApiController.Checklists.clearDone)
             }
@@ -23,9 +22,13 @@ fun Route.v1Routes() {
         route("checklistitems") {
             post(ApiController.ChecklistItems.create)
             route("{id}") {
-                delete(ApiController.ChecklistItems.delete)
                 post("done", ApiController.ChecklistItems.setDone)
+                post("not-done", ApiController.ChecklistItems.setNotDone)
             }
+        }
+
+        route("admin"){
+            get("users", AdminController.getAllUsers)
         }
     }
 }

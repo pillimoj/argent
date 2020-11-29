@@ -13,8 +13,8 @@ buildlocalimage:
 buildproductionimage:
 	./gradlew jib -PjibImage=${IMAGE} -PgitHash=${TAG} --stacktrace
 
-rundocker: buildlocalimage
-	$(eval IMAGE_DIGEST := $(shell jq -r .image build/jib-image.json)@$(shell cat build/jib-image.digest)) \
+rundocker:
+	$(eval IMAGE_DIGEST := $(shell jq -r .image build/jib-image.json)) \
 	docker run -t \
 	--env-file .env \
 	-v ${PWD}/localdockersecrets:/localsecrets \

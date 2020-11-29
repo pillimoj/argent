@@ -4,25 +4,18 @@ import argent.util.extra
 import argent.util.logger
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SqlLogger
-import org.jetbrains.exposed.sql.Transaction
-import org.jetbrains.exposed.sql.addLogger
-import org.jetbrains.exposed.sql.statements.StatementContext
-import org.jetbrains.exposed.sql.statements.expandArgs
-import org.jetbrains.exposed.sql.transactions.TransactionManager
-import org.jetbrains.exposed.sql.transactions.experimental.suspendedTransactionAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.sql.Connection
 import javax.sql.DataSource
 
 object DataBases {
     object Argent {
-        val queryLogger = logger
-        val dataSource by lazy { getDataSource(Config.argentDb) }
-        val database by lazy { Database.connect(dataSource) }
+        val dbPool by lazy { getDataSource(Config.argentDb) }
     }
 }
 
-private fun getDataSource(dbConf: DbConf): DataSource{
+private fun getDataSource(dbConf: DbConf): HikariDataSource{
     return when {
         dbConf.tcpConf != null -> getDataSourceTcp(dbConf.database, dbConf.user, dbConf.password, dbConf.tcpConf)
         dbConf.cloudSqlDbConf != null -> getDataSourceCloudSql(dbConf.database, dbConf.user, dbConf.password, dbConf.cloudSqlDbConf)
@@ -30,7 +23,7 @@ private fun getDataSource(dbConf: DbConf): DataSource{
     }
 }
 
-private fun getDataSourceTcp(database:String, user: String, password: String, conf: TCPDbConf): DataSource {
+private fun getDataSourceTcp(database:String, user: String, password: String, conf: TCPDbConf): HikariDataSource {
     val logger = DataBases.logger
     logger.info(
         "Connecting to db",
@@ -50,7 +43,7 @@ private fun getDataSourceTcp(database:String, user: String, password: String, co
     return HikariDataSource(config)
 }
 
-private fun getDataSourceCloudSql(database:String, user: String, password: String, conf: CloudSqlDbConf): DataSource {
+private fun getDataSourceCloudSql(database:String, user: String, password: String, conf: CloudSqlDbConf): HikariDataSource {
     val logger = DataBases.logger
     logger.info(
         "Connecting to db",
@@ -71,18 +64,8 @@ private fun getDataSourceCloudSql(database:String, user: String, password: Strin
     return HikariDataSource(config)
 }
 
-suspend fun <T> Database.transaction(block: suspend Transaction.() -> T): T {
-    return suspendedTransactionAsync(kotlinx.coroutines.Dispatchers.IO, db = this) {
-        addLogger(QueryLogger)
-        block()
-    }.await()
-}
-
-object QueryLogger : SqlLogger {
-    override fun log (context: StatementContext, transaction: Transaction) {
-            DataBases.Argent.queryLogger.debug(
-                "Querying argent db",
-                extra("query" to context.expandArgs(TransactionManager.current()))
-            )
+suspend fun <T> DataSource.asyncConnection(block: suspend Connection.() -> T): T {
+    return withContext(Dispatchers.IO) {
+        block(connection)
     }
 }
