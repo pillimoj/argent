@@ -37,7 +37,7 @@ object ApiController {
 
     object Checklists {
         val create = authedHandler(HttpMethod.Post) { user ->
-            val checklist = Checklist.marshall(call)
+            val checklist = Checklist.deserialize(call)
             checklistDataStore.addChecklist(checklist, user)
             call.respond(checklist)
         }
@@ -73,11 +73,29 @@ object ApiController {
             checklistDataStore.clearDone(id)
             call.respond(OkResponse)
         }
+
+        val share = authedHandler(HttpMethod.Post) { user ->
+            val checklistId = pathIdParam()
+            val shareRequest = ShareRequest.deserialize(call)
+            if(!isOwner(checklistId, user)){
+                throw ForbiddenException()
+            }
+            checklistDataStore.addUserAccess(checklistId, shareRequest.userId, shareRequest.accessType)
+        }
+
+        val getUsers = authedHandler(HttpMethod.Get){ user ->
+            val checklistId = pathIdParam()
+            if(!hasAccess(checklistId, user)){
+                throw ForbiddenException()
+            }
+            val users = userDataStore.getUsersForChecklist(checklistId)
+            call.respond(users)
+        }
     }
 
     object ChecklistItems {
         val create = authedHandler(HttpMethod.Post) { user ->
-            val item = ChecklistItem.marshall(call)
+            val item = ChecklistItem.deserialize(call)
             if (!hasAccess(item.checklist, user)) throw ForbiddenException()
             checklistDataStore.addItem(item)
             call.respond(OkResponse)
@@ -98,6 +116,13 @@ object ApiController {
             }
             checklistDataStore.setItemDone(id, done)
             callContext.call.respond(OkResponse)
+        }
+    }
+
+    object Users {
+        val getAll = authedHandler(HttpMethod.Get){
+            val users = userDataStore.getAllUsers().map { UserForSharing(it) }
+            call.respond(users)
         }
     }
 }

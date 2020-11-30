@@ -17,6 +17,8 @@ fun Route.v1Routes() {
                 get(ApiController.Checklists.getItems)
                 delete(ApiController.Checklists.delete)
                 post("clear-done", ApiController.Checklists.clearDone)
+                post("share", ApiController.Checklists.share)
+                get("users", ApiController.Checklists.getUsers)
             }
         }
         route("checklistitems") {
@@ -25,6 +27,9 @@ fun Route.v1Routes() {
                 post("done", ApiController.ChecklistItems.setDone)
                 post("not-done", ApiController.ChecklistItems.setNotDone)
             }
+        }
+        route("users"){
+            get(ApiController.Users.getAll)
         }
 
         route("admin"){

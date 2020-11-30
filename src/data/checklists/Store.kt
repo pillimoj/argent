@@ -200,4 +200,22 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
             )
         }
     }
+
+    suspend fun addUserAccess(checklistId: UUID, userId: UUID, accessType: ChecklistAccessType){
+        db.asyncConnection {
+            executeUpdate("""
+                INSERT INTO checklist_access (
+                    checklist,
+                    argent_user,
+                    access_type
+                )
+                VALUES (?,?,?)
+            """.trimIndent(),
+            listOf(
+                checklistId,
+                userId,
+                accessType
+            ))
+        }
+    }
 }

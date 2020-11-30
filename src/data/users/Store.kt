@@ -22,21 +22,20 @@ class UserDataStore(private val db: DataSource) : DatabaseQueries {
         }
     }
 
-    suspend fun getUsersForChecklist(checklistId: UUID): List<User> {
+    suspend fun getUsersForChecklist(checklistId: UUID): List<UserAccess> {
         return db.asyncConnection {
             executeQuery("""
                 SELECT
                     id,
                     name,
-                    email,
-                    role
+                    access_type
                 FROM argent_users u
                 LEFT JOIN checklist_access ca
-                ON ca.user = u.id
+                ON ca.argent_user = u.id
                 WHERE ca.checklist = ?
             """.trimIndent(),
                 listOf(checklistId),
-                parseList { User(it) })
+                parseList { UserAccess(it) })
         }
     }
 
