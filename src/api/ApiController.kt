@@ -81,6 +81,22 @@ object ApiController {
                 throw ForbiddenException()
             }
             checklistDataStore.addUserAccess(checklistId, shareRequest.userId, shareRequest.accessType)
+            call.respond(OkResponse)
+        }
+
+        val unShare = authedHandler(HttpMethod.Post) { user ->
+            val checklistId = pathIdParam()
+            val userId = pathIdParam("userId")
+            val checklistOwners = userDataStore.getUsersForChecklist(checklistId)
+                .filter { it.checklistAccessType == ChecklistAccessType.Owner }
+            if(checklistOwners.size == 1 && checklistOwners.first().id == userId){
+                throw BadRequestException("Cannot remove lst owner of a list")
+            }
+            if(!isOwner(checklistId, user)){
+                throw ForbiddenException()
+            }
+            checklistDataStore.removeUserAccess(checklistId, userId)
+            call.respond(OkResponse)
         }
 
         val getUsers = authedHandler(HttpMethod.Get){ user ->

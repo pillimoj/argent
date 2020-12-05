@@ -214,8 +214,22 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
             listOf(
                 checklistId,
                 userId,
-                accessType
+                accessType,
             ))
+        }
+    }
+
+    suspend fun removeUserAccess(checklistId: UUID, userId: UUID){
+        db.asyncConnection {
+            executeUpdate("""
+                DELETE FROM checklist_access
+                WHERE checklist = ?
+                AND argent_user = ?
+            """.trimIndent(),
+                listOf(
+                    checklistId,
+                    userId,
+                ))
         }
     }
 }

@@ -18,6 +18,7 @@ fun Route.v1Routes() {
                 delete(ApiController.Checklists.delete)
                 post("clear-done", ApiController.Checklists.clearDone)
                 post("share", ApiController.Checklists.share)
+                post("unshare/{userId}", ApiController.Checklists.unShare)
                 get("users", ApiController.Checklists.getUsers)
             }
         }
