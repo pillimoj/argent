@@ -3,6 +3,7 @@ package argent.server.features
 import argent.data.users.User
 import argent.data.users.UserDataStore
 import argent.google.TokenVerification
+import argent.google.getGoogleToken
 import argent.server.ApiException
 import argent.server.DataBases
 import argent.server.ForbiddenException
@@ -19,13 +20,6 @@ import io.ktor.auth.AuthenticationProvider
 import io.ktor.http.HttpHeaders
 import io.ktor.request.header
 import kotlinx.serialization.Serializable
-
-@Serializable
-class GoogleToken(
-    val email: String,
-    val given_name: String,
-    val family_name: String,
-)
 
 class GoogleAuthProvider internal constructor(
     configuration: Configuration
@@ -45,11 +39,7 @@ fun Authentication.Configuration.googleAuthJwt(
     val provider = GoogleAuthProvider(GoogleAuthProvider.Configuration(name).apply(configure))
     provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
         try {
-            val token = call.request.header(HttpHeaders.Authorization)?.replace("Bearer ", "")
-            val payload = token?.let { TokenVerification.verify(token) }
-            val googleToken = payload
-                ?.let { argentJson.decodeFromString(GoogleToken.serializer(), payload) }
-                ?: throw UnauthorizedException()
+            val googleToken = call.getGoogleToken() ?: throw UnauthorizedException()
 
             val user: User = provider.usersStore.getUserForEmail(googleToken.email)
                 ?: throw ForbiddenException()

@@ -15,7 +15,7 @@ typealias CallContext = PipelineContext<Unit, ApplicationCall>
 typealias RouteHandler = suspend CallContext.(Unit) -> Unit
 typealias PrincipalHandler = suspend CallContext.(User) -> Unit
 
-fun handler(method: HttpMethod, block: RouteHandler): RouteHandler = {
+fun unAuthedHandler(method: HttpMethod, block: RouteHandler): RouteHandler = {
     requireMethod(method)
     block(Unit)
 }
