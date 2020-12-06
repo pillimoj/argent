@@ -98,12 +98,13 @@ interface DatabaseQueries {
         fun executeBatch(query: String, argList: Sequence<List<Any?>>) = connection.executeBatch(query, argList, false)
     }
 
-    fun Connection.transaction(block: Transaction.() -> Unit) {
+    fun <T> Connection.transaction(block: Transaction.() -> T): T {
         autoCommit = false
-        block(Transaction(this))
+        val result = block(Transaction(this))
         commit()
         autoCommit = true
         close()
+        return result
     }
 
     fun <T> parseList(block: (ResultSet) -> T) = { resultSet: ResultSet ->
