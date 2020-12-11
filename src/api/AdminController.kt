@@ -3,7 +3,9 @@ package argent.api
 import argent.data.users.User
 import argent.data.users.UserDataStore
 import argent.server.DataBases
+import argent.util.pathIdParam
 import io.ktor.application.call
+import io.ktor.features.callId
 import io.ktor.http.HttpMethod
 import io.ktor.response.respond
 
@@ -18,6 +20,12 @@ object AdminController {
     val addUser = adminHandler(HttpMethod.Post){
         val newUser = User.deserialize(call)
         userDataStore.addUser(newUser)
+        call.respond(OkResponse)
+    }
+
+    val deleteUser = adminHandler(HttpMethod.Delete){
+        val userId = pathIdParam()
+        userDataStore.deleteUser(userId)
         call.respond(OkResponse)
     }
 }

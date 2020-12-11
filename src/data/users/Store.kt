@@ -75,4 +75,16 @@ class UserDataStore(private val db: DataSource) : DatabaseQueries {
             )
         }
     }
+
+    suspend fun deleteUser(userId: UUID) {
+        db.asyncConnection {
+            executeUpdate(
+                """
+                DELETE FROM argent_users
+                WHERE id = ?
+            """.trimIndent(),
+                listOf(userId)
+            )
+        }
+    }
 }
