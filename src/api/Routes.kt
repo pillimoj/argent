@@ -36,5 +36,6 @@ fun Route.v1Routes() {
         route("admin"){
             get("users", AdminController.getAllUsers)
         }
-    }
+    } // end authenticate
+    get("login", ApiController.Users.login)
 }

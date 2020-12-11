@@ -1,0 +1,5 @@
+{
+	"jwtKey": "jwt-secret",
+    "secureCookie": false,
+    "cookieName": "argent_dev_auth"
+}

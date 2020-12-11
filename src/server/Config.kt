@@ -46,6 +46,13 @@ data class TCPDbConf(
     val port: Int
 )
 
+@Serializable
+data class AuthConf(
+    val jwtKey: String,
+    val secureCookie: Boolean,
+    val cookieName: String,
+)
+
 object Config {
 
     val port = getConfig("PORT", "8080").toInt()
@@ -60,7 +67,13 @@ object Config {
     }
 
     val authenticatedEmails by lazy {
-        if(debug) getDevConf(ListSerializer(String.serializer()), "authenticated-emails")
+        if (debug) getDevConf(ListSerializer(String.serializer()), "authenticated-emails")
         else getSecretConf(ListSerializer(String.serializer()), "authenticated-emails")
+    }
+
+    val authentication by lazy {
+        if (debug) getDevConf(AuthConf.serializer(), "argent-authentication")
+        else getSecretConf(AuthConf.serializer(), "argent-authentication")
+
     }
 }

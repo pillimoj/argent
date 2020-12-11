@@ -3,12 +3,11 @@ package argent.server
 import argent.server.features.Headers
 import argent.server.features.Logging
 import argent.server.features.ApiV1Routes
+import argent.server.features.ArgentAuthFeature
 import argent.server.features.BasicRoutes
 import argent.server.features.CORS
 import argent.server.features.ErrorHandling
 import argent.server.features.Feature
-import argent.server.features.GoogleAuthFeature
-import argent.server.features.GoogleAuthProvider
 import argent.server.features.Gzip
 import argent.server.features.JsonNegotiation
 import argent.server.features.features
@@ -19,7 +18,7 @@ fun Application.main(){
     mainWithOverrides()
 }
 
-fun Application.mainWithOverrides(authenticationFeature: Feature = GoogleAuthFeature) {
+fun Application.mainWithOverrides(authenticationFeature: Feature = ArgentAuthFeature) {
     features(
         Logging,
         Headers,

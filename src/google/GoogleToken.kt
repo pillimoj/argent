@@ -19,6 +19,6 @@ private fun String.asToken(): GoogleToken {
 
 fun ApplicationCall.getGoogleToken(): GoogleToken? {
     val token = request.header(HttpHeaders.Authorization)?.replace("Bearer ", "")
-    val payload = token?.let { TokenVerification.verify(token) }
+    val payload = token?.let { GoogleTokenVerification.verify(token) }
     return payload?.asToken()
 }

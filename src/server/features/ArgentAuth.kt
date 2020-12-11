@@ -1,14 +1,11 @@
 package argent.server.features
 
-import argent.data.users.User
 import argent.data.users.UserDataStore
-import argent.google.TokenVerification
-import argent.google.getGoogleToken
+import argent.jwt.ArgentJwt
 import argent.server.ApiException
+import argent.server.Config
 import argent.server.DataBases
-import argent.server.ForbiddenException
 import argent.server.UnauthorizedException
-import argent.util.argentJson
 import argent.util.logger
 import com.auth0.jwt.exceptions.JWTVerificationException
 import io.ktor.application.Application
@@ -17,40 +14,46 @@ import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.AuthenticationPipeline
 import io.ktor.auth.AuthenticationProvider
-import io.ktor.http.HttpHeaders
-import io.ktor.request.header
-import kotlinx.serialization.Serializable
+import io.ktor.http.Cookie
 
-class GoogleAuthProvider internal constructor(
+fun createAuthCookie(argentToken: String): Cookie{
+    val sameSite = "sameSite" to if(Config.authentication.secureCookie) "none" else "strict"
+    return Cookie(
+        name = Config.authentication.cookieName,
+        value = argentToken,
+        path = "/api/v1",
+        secure = Config.authentication.secureCookie,
+        httpOnly = true,
+        extensions = mapOf(sameSite)
+    )
+}
+
+class ArgentAuthProvider internal constructor(
     configuration: Configuration
 ) : AuthenticationProvider(configuration) {
     // internal val confValue: String = configuration.confValue
-    internal val usersStore = UserDataStore(DataBases.Argent.dbPool)
-
     class Configuration internal constructor(name: String?) : AuthenticationProvider.Configuration(name) {
         // var confValue: String = "some valuer"
     }
 }
 
-fun Authentication.Configuration.googleAuthJwt(
+fun Authentication.Configuration.argentAuthJwt(
     name: String? = null,
-    configure: GoogleAuthProvider.Configuration.() -> Unit
+    configure: ArgentAuthProvider.Configuration.() -> Unit
 ) {
-    val provider = GoogleAuthProvider(GoogleAuthProvider.Configuration(name).apply(configure))
+    val provider = ArgentAuthProvider(ArgentAuthProvider.Configuration(name).apply(configure))
     provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
         try {
-            val googleToken = call.getGoogleToken() ?: throw UnauthorizedException()
-
-            val user: User = provider.usersStore.getUserForEmail(googleToken.email)
-                ?: throw ForbiddenException()
-            context.principal(user)
+            val argentToken = call.request.cookies[Config.authentication.cookieName] ?: throw UnauthorizedException()
+            val userFromToken = ArgentJwt.validateToken(argentToken)
+            context.principal(userFromToken)
             return@intercept
         } catch (e: Exception) {
             if (e is ApiException) {
                 throw e
             }
             if (e is JWTVerificationException) {
-                logger.info("Could not verify google token", e)
+                logger.info("Could not verify argent token", e)
                 throw UnauthorizedException()
             }
             logger.error("Token verification error", e)
@@ -60,10 +63,10 @@ fun Authentication.Configuration.googleAuthJwt(
     register(provider)
 }
 
-object GoogleAuthFeature : Feature {
+object ArgentAuthFeature : Feature {
     override val installer: Application.() -> Unit = {
         install(Authentication) {
-            googleAuthJwt { }
+            argentAuthJwt { }
         }
     }
 }
