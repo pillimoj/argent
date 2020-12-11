@@ -35,6 +35,7 @@ fun Route.v1Routes() {
 
         route("admin"){
             get("users", AdminController.getAllUsers)
+            post("users", AdminController.addUser)
         }
     } // end authenticate
     get("login", ApiController.Users.login)

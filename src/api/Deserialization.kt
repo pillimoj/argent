@@ -5,6 +5,8 @@ package argent.api
 import argent.data.checklists.Checklist
 import argent.data.checklists.ChecklistAccessType
 import argent.data.checklists.ChecklistItem
+import argent.data.users.User
+import argent.data.users.UserRole
 import argent.util.GMTDateSerializer
 import argent.util.UUIDSerializer
 import io.ktor.application.ApplicationCall
@@ -32,6 +34,17 @@ private class ChecklistItemReq(private val title: String, private val checklist:
 }
 
 @Serializable
+private class AddUserReq(private val userName: String, private val email: String) {
+    val value: User
+        get() = User(
+            id = UUID.randomUUID(),
+            name = userName,
+            email = email,
+            role = UserRole.User
+        )
+}
+
+@Serializable
 class ShareRequest(val userId: UUID, val accessType: ChecklistAccessType) {
     companion object {
         suspend fun deserialize(call: ApplicationCall): ShareRequest = call.receive()
@@ -40,3 +53,4 @@ class ShareRequest(val userId: UUID, val accessType: ChecklistAccessType) {
 
 suspend fun Checklist.Companion.deserialize(call: ApplicationCall) = call.receive<ChecklistReq>().value
 suspend fun ChecklistItem.Companion.deserialize(call: ApplicationCall) = call.receive<ChecklistItemReq>().value
+suspend fun User.Companion.deserialize(call: ApplicationCall) = call.receive<AddUserReq>().value
