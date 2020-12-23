@@ -1,6 +1,8 @@
 package functional
 
 import ApplicationTest
+import Faker
+import TestAuthDefaultUser
 import argent.data.checklists.Checklist
 import argent.data.checklists.ChecklistItem
 import argent.data.users.User
@@ -11,7 +13,7 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class ChecklistItemsTest : ApplicationTest {
-    override val authenticatedUser: User = TestAuthFeature.defaultTestUser
+    override val authenticatedUser: User = TestAuthDefaultUser
 
     @BeforeClass
     fun setUp(){

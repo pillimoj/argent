@@ -5,10 +5,8 @@ import argent.server.UnauthorizedException
 import argent.util.argentJson
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.impl.NullClaim
-import kotlinx.serialization.decodeFromString
 
-private val issuer = "argent"
+private const val issuer = "argent"
 object ArgentJwt {
     private val algorithm = Algorithm.HMAC256("secret")
     private val verifier = JWT.require(algorithm)

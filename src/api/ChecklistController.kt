@@ -7,23 +7,15 @@ import argent.data.checklists.ChecklistItem
 import argent.data.users.User
 import argent.data.users.UserDataStore
 import argent.data.users.UserRole
-import argent.google.getGoogleToken
-import argent.jwt.ArgentJwt
 import argent.server.BadRequestException
-import argent.server.DataBases
 import argent.server.ForbiddenException
-import argent.server.UnauthorizedException
-import argent.server.features.createAuthCookie
 import argent.util.pathIdParam
 import io.ktor.application.call
 import io.ktor.http.HttpMethod
 import io.ktor.response.respond
 import java.util.UUID
 
-private val checklistDataStore = ChecklistDataStore(DataBases.Argent.dbPool)
-private val userDataStore = UserDataStore(DataBases.Argent.dbPool)
-
-object ApiController {
+class ChecklistController(private val checklistDataStore: ChecklistDataStore, private val userDataStore: UserDataStore) {
     val me = authedHandler(HttpMethod.Get) { user ->
         call.respond(user)
     }
@@ -39,7 +31,7 @@ object ApiController {
         return checklistDataStore.getAccessType(checklistId, user) != null
     }
 
-    object Checklists {
+    inner class Checklists {
         val create = authedHandler(HttpMethod.Post) { user ->
             val checklist = Checklist.deserialize(call)
             checklistDataStore.addChecklist(checklist, user)
@@ -52,7 +44,7 @@ object ApiController {
                 throw ForbiddenException()
             }
             checklistDataStore.deleteChecklist(id)
-            call.respond(OkResponse)
+            call.respondOk()
         }
 
         val getAll = authedHandler(HttpMethod.Get) { user ->
@@ -75,7 +67,7 @@ object ApiController {
                 throw ForbiddenException()
             }
             checklistDataStore.clearDone(id)
-            call.respond(OkResponse)
+            call.respondOk()
         }
 
         val share = authedHandler(HttpMethod.Post) { user ->
@@ -85,7 +77,7 @@ object ApiController {
                 throw ForbiddenException()
             }
             checklistDataStore.addUserAccess(checklistId, shareRequest.userId, shareRequest.accessType)
-            call.respond(OkResponse)
+            call.respondOk()
         }
 
         val unShare = authedHandler(HttpMethod.Post) { user ->
@@ -100,7 +92,7 @@ object ApiController {
                 throw ForbiddenException()
             }
             checklistDataStore.removeUserAccess(checklistId, userId)
-            call.respond(OkResponse)
+            call.respondOk()
         }
 
         val getUsers = authedHandler(HttpMethod.Get){ user ->
@@ -113,12 +105,12 @@ object ApiController {
         }
     }
 
-    object ChecklistItems {
+    inner class ChecklistItems {
         val create = authedHandler(HttpMethod.Post) { user ->
             val item = ChecklistItem.deserialize(call)
             if (!hasAccess(item.checklist, user)) throw ForbiddenException()
             checklistDataStore.addItem(item)
-            call.respond(OkResponse)
+            call.respondOk()
         }
 
         val setDone = authedHandler(HttpMethod.Post) { user ->
@@ -135,24 +127,10 @@ object ApiController {
                 throw BadRequestException()
             }
             checklistDataStore.setItemDone(id, done)
-            callContext.call.respond(OkResponse)
+            callContext.call.respondOk()
         }
     }
 
-    object Users {
-        val getAll = authedHandler(HttpMethod.Get){
-            val users = userDataStore.getAllUsers().map { UserForSharing(it) }
-            call.respond(users)
-        }
-
-        val login = unAuthedHandler(HttpMethod.Get){
-            val googleToken = call.getGoogleToken()
-                ?: throw UnauthorizedException()
-            val user: User = userDataStore.getUserForEmail(googleToken.email)
-                ?: throw ForbiddenException()
-            val argentToken = ArgentJwt.createToken(user)
-            call.response.cookies.append(createAuthCookie(argentToken))
-            call.respond(user)
-        }
-    }
+    val checklists = Checklists()
+    val checklistItems = ChecklistItems()
 }

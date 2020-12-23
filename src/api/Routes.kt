@@ -7,37 +7,37 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 
-fun Route.v1Routes() {
+fun Route.v1Routes(checklistController: ChecklistController, usersController: UsersController, adminController: AdminController) {
     authenticate {
-        get("me", ApiController.me)
+        get("me", checklistController.me)
         route("checklists") {
-            post(ApiController.Checklists.create)
-            get(ApiController.Checklists.getAll)
+            post(checklistController.checklists.create)
+            get(checklistController.checklists.getAll)
             route("{id}") {
-                get(ApiController.Checklists.getItems)
-                delete(ApiController.Checklists.delete)
-                post("clear-done", ApiController.Checklists.clearDone)
-                post("share", ApiController.Checklists.share)
-                post("unshare/{userId}", ApiController.Checklists.unShare)
-                get("users", ApiController.Checklists.getUsers)
+                get(checklistController.checklists.getItems)
+                delete(checklistController.checklists.delete)
+                post("clear-done", checklistController.checklists.clearDone)
+                post("share", checklistController.checklists.share)
+                post("unshare/{userId}", checklistController.checklists.unShare)
+                get("users", checklistController.checklists.getUsers)
             }
         }
         route("checklistitems") {
-            post(ApiController.ChecklistItems.create)
+            post(checklistController.checklistItems.create)
             route("{id}") {
-                post("done", ApiController.ChecklistItems.setDone)
-                post("not-done", ApiController.ChecklistItems.setNotDone)
+                post("done", checklistController.checklistItems.setDone)
+                post("not-done", checklistController.checklistItems.setNotDone)
             }
         }
         route("users"){
-            get(ApiController.Users.getAll)
+            get(usersController.getAll)
         }
 
         route("admin/users"){
-            get(AdminController.getAllUsers)
-            post(AdminController.addUser)
-            delete("{id}", AdminController.deleteUser)
+            get(adminController.getAllUsers)
+            post(adminController.addUser)
+            delete("{id}", adminController.deleteUser)
         }
     } // end authenticate
-    get("login", ApiController.Users.login)
+    get("login", usersController.login)
 }

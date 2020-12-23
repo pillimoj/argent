@@ -1,16 +1,12 @@
 package argent.server.features
 
-import argent.data.users.UserDataStore
 import argent.jwt.ArgentJwt
 import argent.server.ApiException
 import argent.server.Config
-import argent.server.DataBases
 import argent.server.UnauthorizedException
 import argent.util.logger
 import com.auth0.jwt.exceptions.JWTVerificationException
-import io.ktor.application.Application
 import io.ktor.application.call
-import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.AuthenticationPipeline
 import io.ktor.auth.AuthenticationProvider
@@ -61,12 +57,4 @@ fun Authentication.Configuration.argentAuthJwt(
         }
     }
     register(provider)
-}
-
-object ArgentAuthFeature : Feature {
-    override val installer: Application.() -> Unit = {
-        install(Authentication) {
-            argentAuthJwt { }
-        }
-    }
 }

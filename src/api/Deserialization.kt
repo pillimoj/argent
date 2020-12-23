@@ -7,7 +7,6 @@ import argent.data.checklists.ChecklistAccessType
 import argent.data.checklists.ChecklistItem
 import argent.data.users.User
 import argent.data.users.UserRole
-import argent.util.GMTDateSerializer
 import argent.util.UUIDSerializer
 import io.ktor.application.ApplicationCall
 import io.ktor.request.receive

@@ -10,23 +10,21 @@ import io.ktor.request.header
 import org.slf4j.event.Level
 import java.util.UUID
 
-object Logging: Feature {
-    override val installer: Application.() -> Unit = {
-        install(CallId) {
-            retrieve { call ->
-                call.request.header(HttpHeaders.XRequestId)
-            }
-            retrieve {
-                UUID.randomUUID().toString().replace("-", "")
-            }
-            verify { callId ->
-                callId.isNotEmpty()
-            }
-            replyToHeader(HttpHeaders.XRequestId)
+fun Application.installCallLogging(): Unit {
+    install(CallId) {
+        retrieve { call ->
+            call.request.header(HttpHeaders.XRequestId)
         }
-        install(CallLogging) {
-            callIdMdc("requestId")
-            level = Level.INFO
-        }        
+        retrieve {
+            UUID.randomUUID().toString().replace("-", "")
+        }
+        verify { callId ->
+            callId.isNotEmpty()
+        }
+        replyToHeader(HttpHeaders.XRequestId)
+    }
+    install(CallLogging) {
+        callIdMdc("requestId")
+        level = Level.INFO
     }
 }

@@ -9,8 +9,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 class GoogleToken(
     val email: String,
-    val given_name: String,
-    val family_name: String,
 )
 
 private fun String.asToken(): GoogleToken {

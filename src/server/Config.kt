@@ -1,11 +1,11 @@
+@file:Suppress("unused", "unused", "unused", "unused", "unused", "unused")
+
 package argent.server
 
 import argent.google.accessSecretVersion
 import argent.util.argentJson
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.builtins.serializer
 import java.io.File
 
 class ConfigurationError(configKey: String) : Exception("Missing configuration: $configKey")
@@ -64,11 +64,6 @@ object Config {
     val argentDb by lazy {
         if (debug) getDevConf(DbConf.serializer(), "argent-db")
         else getSecretConf(DbConf.serializer(), "argent-db")
-    }
-
-    val authenticatedEmails by lazy {
-        if (debug) getDevConf(ListSerializer(String.serializer()), "authenticated-emails")
-        else getSecretConf(ListSerializer(String.serializer()), "authenticated-emails")
     }
 
     val authentication by lazy {

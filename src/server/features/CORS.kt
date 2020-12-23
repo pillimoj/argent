@@ -6,23 +6,20 @@ import io.ktor.features.CORS
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 
-object CORS : Feature {
-    override val installer: Application.() -> Unit = {
-        install(CORS) {
-            method(HttpMethod.Options)
-            method(HttpMethod.Post)
-            method(HttpMethod.Patch)
-            method(HttpMethod.Put)
-            method(HttpMethod.Delete)
-            header("X-Requested-With")
-            header(HttpHeaders.XForwardedProto)
-            header("X-Request-ID")
-            header("Authorization")
-            host("localhost:5000")
-            host("argent.grimsborn.com", schemes = listOf("https"))
-            allowCredentials = true
-            allowNonSimpleContentTypes = true
-            exposeHeader("X-Request-ID")
-        }
+fun Application.installCORS(): Unit {
+    install(CORS) {
+        method(HttpMethod.Options)
+        method(HttpMethod.Post)
+        method(HttpMethod.Patch)
+        method(HttpMethod.Put)
+        method(HttpMethod.Delete)
+        header("X-Requested-With")
+        header(HttpHeaders.XForwardedProto)
+        header("X-Request-ID")
+        host("localhost:5000")
+        host("argent.grimsborn.com", schemes = listOf("https"))
+        allowCredentials = true
+        allowNonSimpleContentTypes = true
+        exposeHeader("X-Request-ID")
     }
 }

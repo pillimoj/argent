@@ -1,11 +1,13 @@
-import argent.api.ApiController
+import argent.api.AdminController
+import argent.api.ChecklistController
+import argent.api.UsersController
 import argent.data.checklists.ChecklistDataStore
 import argent.data.users.User
 import argent.data.users.UserDataStore
 import argent.server.DataBases
-import argent.server.main
 import argent.server.mainWithOverrides
 import argent.util.runMigrations
+import io.ktor.auth.Authentication
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.withTestApplication
 import kotlinx.coroutines.runBlocking
@@ -14,10 +16,13 @@ interface ApplicationContext {
     val authenticatedUser: User
     val checklistDataStore: ChecklistDataStore
     val userDataStore: UserDataStore
-    val apiController: ApiController
+    val checklistController: ChecklistController
+    val adminController: AdminController
+    val usersController: UsersController
+    val configureAuth: Authentication.Configuration.() -> Unit
     fun <T> testMain(callback: TestApplicationEngine.() -> T): T {
         return withTestApplication({
-            mainWithOverrides(authenticationFeature = TestAuthFeature(authenticatedUser))
+            mainWithOverrides(checklistController, usersController, adminController, configureAuth)
         }) { callback() }
     }
 }
@@ -26,7 +31,12 @@ fun defaultApplicationContext(authenticatedUser: User) = object: ApplicationCont
     override val authenticatedUser = authenticatedUser
     override val checklistDataStore = ChecklistDataStore(DataBases.Argent.dbPool)
     override val userDataStore = UserDataStore(DataBases.Argent.dbPool)
-    override val apiController = ApiController
+    override val checklistController = ChecklistController(checklistDataStore, userDataStore)
+    override val adminController = AdminController(userDataStore)
+    override val usersController = UsersController(userDataStore)
+    override val configureAuth: Authentication.Configuration.() -> Unit = {
+        testAuth { user = authenticatedUser }
+    }
 
     init {
         runMigrations(DataBases.Argent.dbPool)

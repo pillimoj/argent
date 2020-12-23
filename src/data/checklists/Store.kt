@@ -10,18 +10,6 @@ import javax.sql.DataSource
 
 class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
 
-    suspend fun getAllChecklists(): List<Checklist> {
-        return db.asyncConnection {
-            executeQuery("""
-                SELECT id, name
-                FROM checklists
-            """,
-                emptyList(),
-                parseList { Checklist(it) }
-            )
-        }
-    }
-
     suspend fun getChecklistsForUser(user: User): List<Checklist> {
         return db.asyncConnection {
             executeQuery("""
@@ -47,19 +35,6 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                 listOf(checklistId),
                 parseList { ChecklistItem(it) }
             )
-        }
-    }
-
-    suspend fun hasChecklist(checklistId: UUID): Boolean {
-        return null != db.asyncConnection {
-            executeQuery("""
-                SELECT id
-                FROM checklists
-                WHERE id = ?
-                LIMIT 1
-            """.trimIndent(),
-                listOf(checklistId),
-                parse { })
         }
     }
 

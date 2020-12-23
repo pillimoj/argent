@@ -20,27 +20,25 @@ private fun Logger.apiException(e: ApiException) = when (e) {
     else -> info(e.logMessage, e)
 }
 
-object ErrorHandling : Feature {
-    override val installer: Application.() -> Unit = {
-        install(StatusPages) {
+fun Application.installErrorHandling() {
+    install(StatusPages) {
 
-            exception<ApiException> { cause ->
-                logger.apiException(cause)
-                call.respond(HttpStatusCode.fromValue(cause.statusCode), cause.errorMessage())
-            }
+        exception<ApiException> { cause ->
+            logger.apiException(cause)
+            call.respond(HttpStatusCode.fromValue(cause.statusCode), cause.errorMessage())
+        }
 
-            exception<Exception> {
-                logger.error("Ktor caught exception", it)
-                call.respond(HttpStatusCode.InternalServerError, ErrorMessage("Internal Server Error"))
-            }
+        exception<Exception> {
+            logger.error("Ktor caught exception", it)
+            call.respond(HttpStatusCode.InternalServerError, ErrorMessage("Internal Server Error"))
+        }
 
-            status(HttpStatusCode.NotFound) {
-                val path = call.request.path()
-                call.respond(
-                    HttpStatusCode.NotFound,
-                    ErrorMessage("Not found: $path")
-                )
-            }
+        status(HttpStatusCode.NotFound) {
+            val path = call.request.path()
+            call.respond(
+                HttpStatusCode.NotFound,
+                ErrorMessage("Not found: $path")
+            )
         }
     }
 }
