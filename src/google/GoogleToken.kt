@@ -12,7 +12,7 @@ class GoogleToken(
 )
 
 private fun String.asToken(): GoogleToken {
-    return  argentJson.decodeFromString(GoogleToken.serializer(), this)
+    return argentJson.decodeFromString(GoogleToken.serializer(), this)
 }
 
 fun ApplicationCall.getGoogleToken(): GoogleToken? {

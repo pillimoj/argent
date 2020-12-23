@@ -29,11 +29,11 @@ fun Route.v1Routes(checklistController: ChecklistController, usersController: Us
                 post("not-done", checklistController.checklistItems.setNotDone)
             }
         }
-        route("users"){
+        route("users") {
             get(usersController.getAll)
         }
 
-        route("admin/users"){
+        route("admin/users") {
             get(adminController.getAllUsers)
             post(adminController.addUser)
             delete("{id}", adminController.deleteUser)

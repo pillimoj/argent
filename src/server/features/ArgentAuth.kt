@@ -12,8 +12,8 @@ import io.ktor.auth.AuthenticationPipeline
 import io.ktor.auth.AuthenticationProvider
 import io.ktor.http.Cookie
 
-fun createAuthCookie(argentToken: String): Cookie{
-    val sameSite = "SameSite" to if(Config.authentication.secureCookie) "none" else "strict"
+fun createAuthCookie(argentToken: String): Cookie {
+    val sameSite = "SameSite" to if (Config.authentication.secureCookie) "none" else "strict"
     return Cookie(
         name = Config.authentication.cookieName,
         value = argentToken,

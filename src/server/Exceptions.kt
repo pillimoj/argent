@@ -8,8 +8,8 @@ class MissingParametersException private constructor(missingParametersString: St
     constructor(missingParameters: List<String>) : this("Missing parameters: $missingParameters")
 }
 
-class UnauthorizedException: ApiException("Unauthorized", "Unauthorized", 401)
-class ForbiddenException: ApiException("Forbidden", "Forbidden", 403)
+class UnauthorizedException : ApiException("Unauthorized", "Unauthorized", 401)
+class ForbiddenException : ApiException("Forbidden", "Forbidden", 403)
 
 class InternalServerError(message: String) : ApiException("Internal server error", message, 500)
 class BadRequestException(clientMessage: String = "Bad Request", logMessage: String? = null) : ApiException(clientMessage, logMessage ?: clientMessage, 400)

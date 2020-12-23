@@ -69,6 +69,5 @@ object Config {
     val authentication by lazy {
         if (debug) getDevConf(AuthConf.serializer(), "argent-authentication")
         else getSecretConf(AuthConf.serializer(), "argent-authentication")
-
     }
 }

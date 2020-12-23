@@ -16,8 +16,7 @@ class ChecklistItemsTest : ApplicationTest {
     override val authenticatedUser: User = TestAuthDefaultUser
 
     @BeforeClass
-    fun setUp(){
-
+    fun setUp() {
     }
 
     @Test

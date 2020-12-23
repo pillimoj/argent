@@ -13,7 +13,6 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
-
 fun String.toUUIDSafe(): UUID? = runCatching {
     UUID.fromString(this)
 }.getOrNull()
@@ -23,7 +22,7 @@ fun PipelineContext<Unit, ApplicationCall>.pathIdParam(name: String = "id"): UUI
 }
 
 fun PipelineContext<Unit, ApplicationCall>.requireMethod(method: HttpMethod) {
-    if (call.request.httpMethod != method){
+    if (call.request.httpMethod != method) {
         throw MethodNotAllowedException()
     }
 }
@@ -31,4 +30,4 @@ fun PipelineContext<Unit, ApplicationCall>.requireMethod(method: HttpMethod) {
 fun LocalDateTime.toGMTDate(): GMTDate = GMTDate(toEpochSecond(ZoneOffset.UTC))
 fun GMTDate.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(toJvmDate().toInstant(), ZoneOffset.UTC)
 
-inline fun <reified E: Enum<E>> String.asEnum(): E = enumValueOf(this)
+inline fun <reified E : Enum<E>> String.asEnum(): E = enumValueOf(this)

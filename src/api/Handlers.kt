@@ -29,7 +29,7 @@ fun authedHandler(method: HttpMethod, block: PrincipalHandler): RouteHandler = {
 fun adminHandler(method: HttpMethod, block: PrincipalHandler): RouteHandler = {
     requireMethod(method)
     val principal = call.principal<User>() ?: throw InternalServerError("No principal in api handler")
-    if(principal.role != UserRole.Admin){
+    if (principal.role != UserRole.Admin) {
         throw ForbiddenException()
     }
     block(principal)

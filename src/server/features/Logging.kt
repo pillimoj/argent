@@ -10,7 +10,7 @@ import io.ktor.request.header
 import org.slf4j.event.Level
 import java.util.UUID
 
-fun Application.installCallLogging(): Unit {
+fun Application.installCallLogging() {
     install(CallId) {
         retrieve { call ->
             call.request.header(HttpHeaders.XRequestId)

@@ -8,7 +8,8 @@ import javax.sql.DataSource
 class UserDataStore(private val db: DataSource) : DatabaseQueries {
     suspend fun getUserForEmail(email: String): User? {
         return db.asyncConnection {
-            executeQuery("""
+            executeQuery(
+                """
                 SELECT
                     id,
                     name,
@@ -16,15 +17,17 @@ class UserDataStore(private val db: DataSource) : DatabaseQueries {
                     role
                 FROM argent_users
                 WHERE email = ?
-            """.trimIndent(),
-            listOf(email),
-            parse { User(it) })
+                """.trimIndent(),
+                listOf(email),
+                parse { User(it) }
+            )
         }
     }
 
     suspend fun getUsersForChecklist(checklistId: UUID): List<UserAccess> {
         return db.asyncConnection {
-            executeQuery("""
+            executeQuery(
+                """
                 SELECT
                     id,
                     name,
@@ -33,24 +36,27 @@ class UserDataStore(private val db: DataSource) : DatabaseQueries {
                 LEFT JOIN checklist_access ca
                 ON ca.argent_user = u.id
                 WHERE ca.checklist = ?
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(checklistId),
-                parseList { UserAccess(it) })
+                parseList { UserAccess(it) }
+            )
         }
     }
 
     suspend fun getAllUsers(): List<User> {
         return db.asyncConnection {
-            executeQuery("""
+            executeQuery(
+                """
                 SELECT
                     id,
                     name,
                     email,
                     role
                 FROM argent_users u
-            """.trimIndent(),
+                """.trimIndent(),
                 emptyList(),
-                parseList { User(it) })
+                parseList { User(it) }
+            )
         }
     }
 
@@ -65,7 +71,7 @@ class UserDataStore(private val db: DataSource) : DatabaseQueries {
                     role
                 )
                 VALUES(?,?,?,?)
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(
                     user.id,
                     user.name,
@@ -82,7 +88,7 @@ class UserDataStore(private val db: DataSource) : DatabaseQueries {
                 """
                 DELETE FROM argent_users
                 WHERE id = ?
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(userId)
             )
         }

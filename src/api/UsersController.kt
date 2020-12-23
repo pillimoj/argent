@@ -12,12 +12,12 @@ import io.ktor.http.HttpMethod
 import io.ktor.response.respond
 
 class UsersController(private val userDataStore: UserDataStore) {
-    val getAll = authedHandler(HttpMethod.Get){
+    val getAll = authedHandler(HttpMethod.Get) {
         val users = userDataStore.getAllUsers().map { UserForSharing(it) }
         call.respond(users)
     }
 
-    val login = unAuthedHandler(HttpMethod.Get){
+    val login = unAuthedHandler(HttpMethod.Get) {
         val googleToken = call.getGoogleToken()
             ?: throw UnauthorizedException()
         val user: User = userDataStore.getUserForEmail(googleToken.email)

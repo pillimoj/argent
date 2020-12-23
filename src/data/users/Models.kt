@@ -12,7 +12,7 @@ import kotlinx.serialization.UseSerializers
 import java.sql.ResultSet
 import java.util.UUID
 
-enum class UserRole{
+enum class UserRole {
     Admin,
     User
 }
@@ -23,7 +23,7 @@ data class User(
     val name: String,
     val email: String,
     val role: UserRole,
-): Principal {
+) : Principal {
     constructor(rs: ResultSet) : this(
         id = rs.getUUID("id"),
         name = rs.getString("name"),
@@ -37,7 +37,7 @@ data class UserAccess(
     val id: UUID,
     val name: String,
     val checklistAccessType: ChecklistAccessType,
-): Principal {
+) : Principal {
     constructor(rs: ResultSet) : this(
         id = rs.getUUID("id"),
         name = rs.getString("name"),

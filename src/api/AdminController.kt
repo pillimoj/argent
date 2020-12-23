@@ -2,25 +2,24 @@ package argent.api
 
 import argent.data.users.User
 import argent.data.users.UserDataStore
-import argent.server.DataBases
 import argent.util.pathIdParam
 import io.ktor.application.call
 import io.ktor.http.HttpMethod
 import io.ktor.response.respond
 
 class AdminController(private val userDataStore: UserDataStore) {
-    val getAllUsers = adminHandler(HttpMethod.Get){
+    val getAllUsers = adminHandler(HttpMethod.Get) {
         val allUsers = userDataStore.getAllUsers()
         call.respond(allUsers)
     }
 
-    val addUser = adminHandler(HttpMethod.Post){
+    val addUser = adminHandler(HttpMethod.Post) {
         val newUser = User.deserialize(call)
         userDataStore.addUser(newUser)
         call.respondOk()
     }
 
-    val deleteUser = adminHandler(HttpMethod.Delete){
+    val deleteUser = adminHandler(HttpMethod.Delete) {
         val userId = pathIdParam()
         userDataStore.deleteUser(userId)
         call.respondOk()

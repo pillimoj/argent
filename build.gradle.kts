@@ -4,6 +4,7 @@ plugins {
     kotlin("plugin.serialization") version "1.4.10"
     kotlin("jvm") version "1.4.10"
     id("com.google.cloud.tools.jib") version "2.5.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
     application
 }
 
@@ -21,21 +22,20 @@ application {
 }
 
 kotlin.sourceSets {
-        main {
-            kotlin.srcDir("src")
-            resources.srcDir("resources")
-        }
-        test {
-            kotlin.srcDir("test")
-            resources.srcDir("testresources")
-        }
+    main {
+        kotlin.srcDir("src")
+        resources.srcDir("resources")
     }
+    test {
+        kotlin.srcDir("test")
+        resources.srcDir("testresources")
+    }
+}
 sourceSets {
     main {
         resources { srcDir("resources") }
     }
 }
-
 
 repositories {
     jcenter()
@@ -102,7 +102,6 @@ jib {
         if (hasProperty("gitHash")) tags = setOf(properties["gitHash"]!!.toString())
     }
 }
-
 
 val test = tasks.withType<Test> {
     getEnvVariables().forEach { environment(it.key, it.value) }

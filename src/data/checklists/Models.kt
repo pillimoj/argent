@@ -22,8 +22,8 @@ enum class ChecklistAccessType {
 data class Checklist(
     val id: UUID,
     val name: String,
-){
-    constructor(rs: ResultSet): this(
+) {
+    constructor(rs: ResultSet) : this(
         id = rs.getUUID("id"),
         name = rs.getString("name")
     )
@@ -37,7 +37,7 @@ data class ChecklistItem(
     val checklist: UUID,
     val createdAt: GMTDate,
 ) {
-    constructor(rs: ResultSet): this(
+    constructor(rs: ResultSet) : this(
         id = rs.getUUID("id"),
         title = rs.getString("title"),
         done = rs.getBoolean("done"),

@@ -73,7 +73,7 @@ class ChecklistController(private val checklistDataStore: ChecklistDataStore, pr
         val share = authedHandler(HttpMethod.Post) { user ->
             val checklistId = pathIdParam()
             val shareRequest = ShareRequest.deserialize(call)
-            if(!isOwner(checklistId, user)){
+            if (!isOwner(checklistId, user)) {
                 throw ForbiddenException()
             }
             checklistDataStore.addUserAccess(checklistId, shareRequest.userId, shareRequest.accessType)
@@ -85,19 +85,19 @@ class ChecklistController(private val checklistDataStore: ChecklistDataStore, pr
             val userId = pathIdParam("userId")
             val checklistOwners = userDataStore.getUsersForChecklist(checklistId)
                 .filter { it.checklistAccessType == ChecklistAccessType.Owner }
-            if(checklistOwners.size == 1 && checklistOwners.first().id == userId){
+            if (checklistOwners.size == 1 && checklistOwners.first().id == userId) {
                 throw BadRequestException("Cannot remove lst owner of a list")
             }
-            if(!isOwner(checklistId, user)){
+            if (!isOwner(checklistId, user)) {
                 throw ForbiddenException()
             }
             checklistDataStore.removeUserAccess(checklistId, userId)
             call.respondOk()
         }
 
-        val getUsers = authedHandler(HttpMethod.Get){ user ->
+        val getUsers = authedHandler(HttpMethod.Get) { user ->
             val checklistId = pathIdParam()
-            if(!hasAccess(checklistId, user)){
+            if (!hasAccess(checklistId, user)) {
                 throw ForbiddenException()
             }
             val users = userDataStore.getUsersForChecklist(checklistId)
@@ -120,10 +120,10 @@ class ChecklistController(private val checklistDataStore: ChecklistDataStore, pr
             setItemStatus(this, user, false)
         }
 
-        private suspend fun setItemStatus(callContext: CallContext, user: User, done: Boolean){
+        private suspend fun setItemStatus(callContext: CallContext, user: User, done: Boolean) {
             val id = callContext.pathIdParam()
             val item = checklistDataStore.getItem(id)
-            if(item == null || !hasAccess(item.checklist, user)){
+            if (item == null || !hasAccess(item.checklist, user)) {
                 throw BadRequestException()
             }
             checklistDataStore.setItemDone(id, done)

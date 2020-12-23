@@ -6,7 +6,7 @@ import io.ktor.features.CORS
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 
-fun Application.installCORS(): Unit {
+fun Application.installCORS() {
     install(CORS) {
         method(HttpMethod.Options)
         method(HttpMethod.Post)

@@ -25,7 +25,7 @@ import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.serialization.json
 
-fun Application.main(){
+fun Application.main() {
     val userDataStore = UserDataStore(DataBases.Argent.dbPool)
     val checklistDataStore = ChecklistDataStore(DataBases.Argent.dbPool)
 
@@ -33,7 +33,7 @@ fun Application.main(){
     val checklistController = ChecklistController(checklistDataStore, userDataStore)
     val usersController = UsersController(userDataStore)
 
-    val configureAuth: Authentication.Configuration.() -> Unit = {argentAuthJwt {  }}
+    val configureAuth: Authentication.Configuration.() -> Unit = { argentAuthJwt { } }
 
     mainWithOverrides(checklistController, usersController, adminController, configureAuth)
 }
@@ -60,5 +60,4 @@ fun Application.mainWithOverrides(
         get("/health-check", UtilController.healthCheck)
         route("api/v1") { v1Routes(checklistController, usersController, adminController) }
     }
-
 }

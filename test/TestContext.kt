@@ -27,7 +27,7 @@ interface ApplicationContext {
     }
 }
 
-fun defaultApplicationContext(authenticatedUser: User) = object: ApplicationContext {
+fun defaultApplicationContext(authenticatedUser: User) = object : ApplicationContext {
     override val authenticatedUser = authenticatedUser
     override val checklistDataStore = ChecklistDataStore(DataBases.Argent.dbPool)
     override val userDataStore = UserDataStore(DataBases.Argent.dbPool)
@@ -41,7 +41,7 @@ fun defaultApplicationContext(authenticatedUser: User) = object: ApplicationCont
     init {
         runMigrations(DataBases.Argent.dbPool)
         runBlocking {
-            if(null == userDataStore.getUserForEmail(authenticatedUser.email)){
+            if (null == userDataStore.getUserForEmail(authenticatedUser.email)) {
                 userDataStore.addUser(authenticatedUser)
             }
         }
@@ -50,11 +50,11 @@ fun defaultApplicationContext(authenticatedUser: User) = object: ApplicationCont
 
 interface ApplicationTest {
     val authenticatedUser: User
-    fun <T: Any> withAppContext(context: ApplicationContext = defaultApplicationContext(authenticatedUser),block: suspend ApplicationContext.() -> T): T {
+    fun <T : Any> withAppContext(context: ApplicationContext = defaultApplicationContext(authenticatedUser), block: suspend ApplicationContext.() -> T): T {
         return runBlocking { context.run { block() } }
     }
 
-    fun <T> testApp(context: ApplicationContext = defaultApplicationContext(authenticatedUser),block: suspend ApplicationContext.() -> T) {
+    fun <T> testApp(context: ApplicationContext = defaultApplicationContext(authenticatedUser), block: suspend ApplicationContext.() -> T) {
         runBlocking { context.run { block() } }
     }
 }

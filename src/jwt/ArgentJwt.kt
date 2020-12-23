@@ -11,12 +11,12 @@ object ArgentJwt {
     private val algorithm = Algorithm.HMAC256("secret")
     private val verifier = JWT.require(algorithm)
         .withIssuer(issuer)
-        .build() //Reusable verifier instance
+        .build() // Reusable verifier instance
 
     fun createToken(user: User): String = JWT.create()
-            .withIssuer(issuer)
-            .withClaim("argent_user", argentJson.encodeToString(User.serializer(), user))
-            .sign(algorithm)
+        .withIssuer(issuer)
+        .withClaim("argent_user", argentJson.encodeToString(User.serializer(), user))
+        .sign(algorithm)
 
     fun validateToken(token: String): User {
         val validToken = verifier.verify(token) ?: throw UnauthorizedException()

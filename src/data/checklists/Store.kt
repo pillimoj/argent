@@ -12,13 +12,14 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
 
     suspend fun getChecklistsForUser(user: User): List<Checklist> {
         return db.asyncConnection {
-            executeQuery("""
+            executeQuery(
+                """
                 SELECT id, name
                 FROM checklists c
                 LEFT JOIN checklist_access ca
                 ON c.id = ca.checklist
                 WHERE ca.argent_user = ?
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(user.id),
                 parseList { Checklist(it) }
             )
@@ -27,11 +28,12 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
 
     suspend fun getChecklistItems(checklistId: UUID): List<ChecklistItem> {
         return db.asyncConnection {
-            executeQuery("""
+            executeQuery(
+                """
                 SELECT id, title, done, created_at, checklist
                 FROM checklistitems
                 WHERE checklist = ?
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(checklistId),
                 parseList { ChecklistItem(it) }
             )
@@ -48,7 +50,7 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                     name
                )
                VALUES(?,?)
-            """.trimIndent(),
+                    """.trimIndent(),
                     listOf(checklist.id, checklist.name)
                 )
                 executeUpdate(
@@ -59,7 +61,7 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                     access_type
                 )
                 VALUES(?,?,?)
-            """.trimIndent(),
+                    """.trimIndent(),
                     listOf(
                         checklist.id,
                         user.id,
@@ -72,7 +74,8 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
 
     suspend fun getItem(itemId: UUID): ChecklistItem? {
         return db.asyncConnection {
-            executeQuery("""
+            executeQuery(
+                """
                 SELECT
                     id,
                     title,
@@ -81,9 +84,10 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                     checklist
                 FROM checklistitems
                 WHERE id = ?
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(itemId),
-                parse { ChecklistItem(it) })
+                parse { ChecklistItem(it) }
+            )
         }
     }
 
@@ -99,7 +103,7 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                     created_at
                 )
                 VALUES (?,?,?,?,?)
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(
                     checklistItem.id,
                     checklistItem.title,
@@ -118,7 +122,7 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                 UPDATE checklistitems
                 SET done = ?
                 WHERE id = ?
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(isDone, checklistItemId)
             )
         }
@@ -131,14 +135,14 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                     """
                     DELETE FROM checklistitems
                     WHERE checklist = ?
-                """.trimIndent(),
+                    """.trimIndent(),
                     listOf(checklistId)
                 )
                 executeUpdate(
                     """
                     DELETE FROM checklists
                     WHERE id = ?
-                """.trimIndent(),
+                    """.trimIndent(),
                     listOf(checklistId)
                 )
             }
@@ -152,7 +156,7 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                 DELETE FROM checklistitems
                 WHERE checklist = ?
                 AND done
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(checklistId)
             )
         }
@@ -166,7 +170,7 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                 FROM checklist_access
                 WHERE checklist = ?
                 AND argent_user = ?
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(
                     checklistId,
                     user.id,
@@ -176,35 +180,39 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
         }
     }
 
-    suspend fun addUserAccess(checklistId: UUID, userId: UUID, accessType: ChecklistAccessType){
+    suspend fun addUserAccess(checklistId: UUID, userId: UUID, accessType: ChecklistAccessType) {
         db.asyncConnection {
-            executeUpdate("""
+            executeUpdate(
+                """
                 INSERT INTO checklist_access (
                     checklist,
                     argent_user,
                     access_type
                 )
                 VALUES (?,?,?)
-            """.trimIndent(),
-            listOf(
-                checklistId,
-                userId,
-                accessType,
-            ))
-        }
-    }
-
-    suspend fun removeUserAccess(checklistId: UUID, userId: UUID){
-        db.asyncConnection {
-            executeUpdate("""
-                DELETE FROM checklist_access
-                WHERE checklist = ?
-                AND argent_user = ?
-            """.trimIndent(),
+                """.trimIndent(),
                 listOf(
                     checklistId,
                     userId,
-                ))
+                    accessType,
+                )
+            )
+        }
+    }
+
+    suspend fun removeUserAccess(checklistId: UUID, userId: UUID) {
+        db.asyncConnection {
+            executeUpdate(
+                """
+                DELETE FROM checklist_access
+                WHERE checklist = ?
+                AND argent_user = ?
+                """.trimIndent(),
+                listOf(
+                    checklistId,
+                    userId,
+                )
+            )
         }
     }
 }
