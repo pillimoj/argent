@@ -11,6 +11,7 @@ import io.ktor.auth.Authentication
 import io.ktor.auth.AuthenticationPipeline
 import io.ktor.auth.AuthenticationProvider
 import io.ktor.http.Cookie
+import io.ktor.util.date.GMTDate
 
 fun createAuthCookie(argentToken: String): Cookie {
     val sameSite = "SameSite" to if (Config.authentication.secureCookie) "none" else "strict"
@@ -21,6 +22,19 @@ fun createAuthCookie(argentToken: String): Cookie {
         secure = Config.authentication.secureCookie,
         httpOnly = true,
         extensions = mapOf(sameSite)
+    )
+}
+
+fun createExpiredCookie(): Cookie {
+    val sameSite = "SameSite" to if (Config.authentication.secureCookie) "none" else "strict"
+    return Cookie(
+        name = Config.authentication.cookieName,
+        value = "",
+        path = "/api/v1",
+        secure = Config.authentication.secureCookie,
+        httpOnly = true,
+        extensions = mapOf(sameSite),
+        expires = GMTDate.START
     )
 }
 

@@ -40,4 +40,5 @@ fun Route.v1Routes(checklistController: ChecklistController, usersController: Us
         }
     } // end authenticate
     get("login", usersController.login)
+    get("logout", usersController.logout)
 }

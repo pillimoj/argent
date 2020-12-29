@@ -7,6 +7,7 @@ import argent.jwt.ArgentJwt
 import argent.server.ForbiddenException
 import argent.server.UnauthorizedException
 import argent.server.features.createAuthCookie
+import argent.server.features.createExpiredCookie
 import io.ktor.application.call
 import io.ktor.http.HttpMethod
 import io.ktor.response.respond
@@ -25,5 +26,10 @@ class UsersController(private val userDataStore: UserDataStore) {
         val argentToken = ArgentJwt.createToken(user)
         call.response.cookies.append(createAuthCookie(argentToken))
         call.respond(user)
+    }
+
+    val logout = unAuthedHandler(HttpMethod.Get) {
+        call.response.cookies.append(createExpiredCookie())
+        call.respondOk()
     }
 }
