@@ -57,7 +57,6 @@ object Config {
 
     val port = getConfig("PORT", "8080").toInt()
     private val debug = getConfig("ARGENT_DEBUG", "false") == "true"
-    val watchPaths = if (debug) listOf("argent") else emptyList()
 
     val googleProject = getConfig("GOOGLE_CLOUD_PROJECT")
 

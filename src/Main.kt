@@ -3,7 +3,6 @@ package argent
 import argent.server.Config
 import argent.server.DataBases
 import argent.server.main
-import argent.util.extra
 import argent.util.runMigrations
 import io.ktor.application.Application
 import io.ktor.server.engine.embeddedServer
@@ -21,11 +20,10 @@ fun main() {
             factory = Netty,
             module = Application::main,
             port = Config.port,
-            watchPaths = Config.watchPaths,
             configure = {
                 responseWriteTimeoutSeconds = 30
-            }
+            },
         )
-    logger.info("Starting embedded server...", extra("watchPaths" to Config.watchPaths))
+    logger.info("Starting embedded server...")
     server.start()
 }

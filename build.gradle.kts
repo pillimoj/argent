@@ -1,14 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("plugin.serialization") version "1.4.10"
-    kotlin("jvm") version "1.4.10"
-    id("com.google.cloud.tools.jib") version "2.5.0"
+    kotlin("plugin.serialization") version "1.4.21"
+    kotlin("jvm") version "1.4.21"
+    id("com.google.cloud.tools.jib") version "2.7.1"
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
     application
 }
 
-val ktorVersion = "1.4.1"
+val ktorVersion = "1.5.0"
 val argentMainClass = "argent.MainKt"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -68,11 +68,10 @@ dependencies {
 
     // Google
     implementation("com.google.cloud:google-cloud-secretmanager:1.0.0")
-    implementation("com.google.cloud.sql:postgres-socket-factory:1.0.16")
+    implementation("com.google.cloud.sql:postgres-socket-factory:1.2.0")
 
     // JWT
-    implementation("com.auth0:java-jwt:3.11.0")
-    implementation("com.auth0:jwks-rsa:0.14.1")
+    implementation("com.auth0:java-jwt:3.12.0")
 
     // Tests
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
@@ -112,6 +111,7 @@ val test = tasks.withType<Test> {
 }
 
 tasks.getByName<JavaExec>("run") {
+    this.systemProperties["io.ktor.development"] = getEnvVariables()["ARGENT_DEBUG"] == "true"
     getEnvVariables().forEach { environment(it.key, it.value) }
 }
 
