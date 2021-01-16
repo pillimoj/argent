@@ -33,6 +33,7 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
                 SELECT id, title, done, created_at, checklist
                 FROM checklistitems
                 WHERE checklist = ?
+                ORDER BY created_at
                 """.trimIndent(),
                 listOf(checklistId),
                 parseList { ChecklistItem(it) }
