@@ -20,4 +20,11 @@ private class WishlistItemReq(val title: String, val user: UUID) {
     )
 }
 
+@Serializable
+class WishlistShareRequest(val user: UUID){
+    companion object {
+        suspend fun deserialize(call: ApplicationCall) = call.receive<WishlistShareRequest>()
+    }
+}
+
 suspend fun WishlistItem.Companion.deserialize(call: ApplicationCall) = call.receive<WishlistItemReq>().value

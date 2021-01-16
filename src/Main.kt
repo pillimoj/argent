@@ -1,9 +1,9 @@
 package argent
 
+import argent.data.runMigrations
 import argent.server.Config
 import argent.server.DataBases
 import argent.server.main
-import argent.util.runMigrations
 import io.ktor.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty

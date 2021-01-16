@@ -1,4 +1,4 @@
-package argent.util
+package argent.data
 
 import java.sql.Connection
 import java.sql.PreparedStatement

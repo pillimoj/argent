@@ -3,6 +3,7 @@ package argent.api
 import argent.api.controllers.AdminController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.UsersController
+import argent.api.controllers.WishListController
 import io.ktor.auth.authenticate
 import io.ktor.routing.Route
 import io.ktor.routing.delete
@@ -14,7 +15,8 @@ fun Route.v1Routes(
     checklistController: ChecklistController,
     wishListController: WishListController,
     usersController: UsersController,
-    adminController: AdminController) {
+    adminController: AdminController
+) {
     authenticate {
         get("me", checklistController.me)
         route("checklists") {
@@ -36,8 +38,19 @@ fun Route.v1Routes(
                 post("not-done", checklistController.checklistItems.setNotDone)
             }
         }
-        route("wishlists"){
+        route("wishlist-items") {
             post(wishListController.addWishListItem)
+            route("{id}"){
+                delete(wishListController.deleteWishListItem)
+                post("take", wishListController.takeItem)
+            }
+        }
+        route("wishlists"){
+            get(wishListController.getAvailableWishlistsUsers)
+            get("me", wishListController.getOwnItems)
+            get("shared-with", wishListController.getUsersWithAccess)
+            post("share", wishListController.shareWithUser)
+            get("{id}", wishListController.getItemsForUser)
         }
         route("users") {
             get(usersController.getAll)

@@ -1,7 +1,7 @@
 package argent.data.users
 
-import argent.server.asyncConnection
-import argent.util.DatabaseQueries
+import argent.data.DatabaseQueries
+import argent.data.asyncConnection
 import java.util.UUID
 import javax.sql.DataSource
 

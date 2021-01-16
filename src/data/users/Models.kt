@@ -3,9 +3,9 @@
 package argent.data.users
 
 import argent.data.checklists.ChecklistAccessType
+import argent.data.getUUID
 import argent.util.UUIDSerializer
 import argent.util.asEnum
-import argent.util.getUUID
 import io.ktor.auth.Principal
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers

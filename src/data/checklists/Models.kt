@@ -2,10 +2,10 @@
 
 package argent.data.checklists
 
+import argent.data.getLocalDateTime
+import argent.data.getUUID
 import argent.util.GMTDateSerializer
 import argent.util.UUIDSerializer
-import argent.util.getLocalDateTime
-import argent.util.getUUID
 import argent.util.toGMTDate
 import io.ktor.util.date.GMTDate
 import kotlinx.serialization.Serializable

@@ -4,10 +4,6 @@ import argent.util.extra
 import argent.util.logger
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.sql.Connection
-import javax.sql.DataSource
 
 object DataBases {
     object Argent {
@@ -62,10 +58,4 @@ private fun getDataSourceCloudSql(database: String, user: String, password: Stri
         addDataSourceProperty("cloudSqlInstance", conf.connectionName)
     }
     return HikariDataSource(config)
-}
-
-suspend fun <T> DataSource.asyncConnection(block: suspend Connection.() -> T): T {
-    return withContext(Dispatchers.IO) {
-        block(connection)
-    }
 }
