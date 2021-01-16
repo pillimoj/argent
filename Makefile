@@ -8,10 +8,10 @@ database:
 	docker-compose up -d	
 	
 buildlocalimage:
-	./gradlew jibDockerBuild -PgitHash=${TAG} --stacktrace
+	./gradlew jibDockerBuild -PgitHash=${TAG} --info
 
 buildproductionimage:
-	./gradlew jib -PjibImage=${IMAGE} -PgitHash=${TAG} --stacktrace
+	./gradlew jib -PjibImage=${IMAGE} -PgitHash=${TAG} --info
 
 rundocker:
 	$(eval IMAGE_DIGEST := $(shell jq -r .image build/jib-image.json)) \
