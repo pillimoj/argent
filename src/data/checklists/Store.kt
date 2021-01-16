@@ -1,8 +1,8 @@
 package argent.data.checklists
 
+import argent.data.DatabaseQueries
+import argent.data.asyncConnection
 import argent.data.users.User
-import argent.server.asyncConnection
-import argent.util.DatabaseQueries
 import argent.util.asEnum
 import argent.util.toLocalDateTime
 import java.util.UUID

@@ -1,4 +1,4 @@
-package argent.util
+package argent.data
 
 import org.flywaydb.core.Flyway
 import javax.sql.DataSource

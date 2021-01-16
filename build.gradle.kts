@@ -117,6 +117,7 @@ tasks.getByName<JavaExec>("run") {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
+    dependsOn("ktlintCheck")
 }
 
 fun getEnvVariables(): Map<String, String> {
