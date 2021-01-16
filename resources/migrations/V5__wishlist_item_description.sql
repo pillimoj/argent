@@ -1,0 +1,1 @@
+ALTER TABLE wishlist_access ADD COLUMN description TEXT NOT NULL;

@@ -35,6 +35,7 @@ class WishlistDataStore(private val db: DataSource) : DatabaseQueries {
                 SELECT
                     id,
                     title,
+                    description
                     taken_by,
                     argent_user
                 FROM wishlist_items
@@ -53,6 +54,7 @@ class WishlistDataStore(private val db: DataSource) : DatabaseQueries {
                 SELECT
                     id,
                     title,
+                    description,
                     taken_by,
                     argent_user
                 FROM wishlist_items

@@ -15,12 +15,14 @@ import java.util.UUID
 data class WishlistItem(
     val id: UUID,
     val title: String,
+    val description: String,
     val takenBy: UUID?,
     val user: UUID,
 ) {
     constructor(rs: ResultSet) : this(
         id = rs.getUUID("id"),
         title = rs.getString("title"),
+        description = rs.getString("description"),
         takenBy = rs.getUUIDOrNull("taken_by"),
         user = rs.getUUID("argent_user"),
     )
