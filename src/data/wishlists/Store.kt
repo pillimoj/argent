@@ -2,7 +2,6 @@ package argent.data.wishlists
 
 import argent.data.DatabaseQueries
 import argent.data.asyncConnection
-import argent.data.getUUID
 import argent.data.users.User
 import java.util.UUID
 import javax.sql.DataSource
@@ -157,7 +156,7 @@ class WishlistDataStore(private val db: DataSource) : DatabaseQueries {
                 AND access_user = ?
                 """.trimIndent(),
                 listOf(wishlistUserId, user.id),
-                parse {  }
+                parse { }
             )
         } != null
     }

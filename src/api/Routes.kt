@@ -40,12 +40,12 @@ fun Route.v1Routes(
         }
         route("wishlist-items") {
             post(wishListController.addWishListItem)
-            route("{id}"){
+            route("{id}") {
                 delete(wishListController.deleteWishListItem)
                 post("take", wishListController.takeItem)
             }
         }
-        route("wishlists"){
+        route("wishlists") {
             get(wishListController.getAvailableWishlistsUsers)
             get("me", wishListController.getOwnItems)
             get("shared-with", wishListController.getUsersWithAccess)
