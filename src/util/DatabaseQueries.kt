@@ -131,6 +131,8 @@ fun ResultSet.getLocalDateTimeOrNull(columnName: String): LocalDateTime? =
     this.getObject(columnName, LocalDateTime::class.java)
 
 fun ResultSet.getUUID(columnName: String) = this.getObject(columnName, UUID::class.java)!!
+fun ResultSet.getUUIDOrNull(columnName: String): UUID? = this.getObject(columnName, UUID::class.java)
+
 fun ResultSet.getStringList(columnName: String) =
     (getArray(columnName).array as? Array<out Any?>)?.filterIsInstance<String>() ?: emptyList()
 

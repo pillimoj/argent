@@ -10,7 +10,11 @@ import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
 
-fun Route.v1Routes(checklistController: ChecklistController, usersController: UsersController, adminController: AdminController) {
+fun Route.v1Routes(
+    checklistController: ChecklistController,
+    wishListController: WishListController,
+    usersController: UsersController,
+    adminController: AdminController) {
     authenticate {
         get("me", checklistController.me)
         route("checklists") {
@@ -31,6 +35,9 @@ fun Route.v1Routes(checklistController: ChecklistController, usersController: Us
                 post("done", checklistController.checklistItems.setDone)
                 post("not-done", checklistController.checklistItems.setNotDone)
             }
+        }
+        route("wishlists"){
+            post(wishListController.addWishListItem)
         }
         route("users") {
             get(usersController.getAll)

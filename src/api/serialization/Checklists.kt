@@ -29,6 +29,5 @@ private class ChecklistItemReq(private val title: String, private val checklist:
         )
 }
 
-
 suspend fun Checklist.Companion.deserialize(call: ApplicationCall) = call.receive<ChecklistReq>().value
 suspend fun ChecklistItem.Companion.deserialize(call: ApplicationCall) = call.receive<ChecklistItemReq>().value
