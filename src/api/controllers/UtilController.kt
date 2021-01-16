@@ -1,5 +1,6 @@
-package argent.api
+package argent.api.controllers
 
+import argent.api.unAuthedHandler
 import io.ktor.application.call
 import io.ktor.http.HttpMethod
 import io.ktor.response.respond

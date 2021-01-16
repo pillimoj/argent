@@ -1,9 +1,9 @@
 package argent.server
 
-import argent.api.AdminController
-import argent.api.ChecklistController
-import argent.api.UsersController
-import argent.api.UtilController
+import argent.api.controllers.AdminController
+import argent.api.controllers.ChecklistController
+import argent.api.controllers.UsersController
+import argent.api.controllers.UtilController
 import argent.api.v1Routes
 import argent.data.checklists.ChecklistDataStore
 import argent.data.users.UserDataStore

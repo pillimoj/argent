@@ -1,6 +1,6 @@
-import argent.api.AdminController
-import argent.api.ChecklistController
-import argent.api.UsersController
+import argent.api.controllers.AdminController
+import argent.api.controllers.ChecklistController
+import argent.api.controllers.UsersController
 import argent.data.checklists.ChecklistDataStore
 import argent.data.users.User
 import argent.data.users.UserDataStore

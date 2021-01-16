@@ -1,5 +1,8 @@
 package argent.api
 
+import argent.api.controllers.AdminController
+import argent.api.controllers.ChecklistController
+import argent.api.controllers.UsersController
 import io.ktor.auth.authenticate
 import io.ktor.routing.Route
 import io.ktor.routing.delete
