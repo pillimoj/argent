@@ -49,6 +49,19 @@ class WishListController(wishlistDataStore: WishlistDataStore) {
         call.respondOk()
     }
 
+    val releaseItem = authedHandler(HttpMethod.Post) { user ->
+        val itemId = pathIdParam()
+        val wishlistItem = wishlistDataStore.getWishlistItem(itemId) ?: throw NotFoundException()
+        if (!wishlistDataStore.userHasAccess(wishlistItem.user, user)) {
+            throw ForbiddenException()
+        }
+        if (user.id != wishlistItem.takenBy) {
+            throw ForbiddenException()
+        }
+        wishlistDataStore.setItemNotTaken(itemId)
+        call.respondOk()
+    }
+
     val getItemsForUser = authedHandler(HttpMethod.Get) { user ->
         val wishListUserId = pathIdParam()
         if (!wishlistDataStore.userHasAccess(wishListUserId, user)) {

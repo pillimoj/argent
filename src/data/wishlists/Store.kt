@@ -101,6 +101,19 @@ class WishlistDataStore(private val db: DataSource) : DatabaseQueries {
         }
     }
 
+    suspend fun setItemNotTaken(wishlistItemId: UUID) {
+        db.asyncConnection {
+            executeUpdate(
+                """
+                UPDATE wishlist_items
+                SET taken_by = NULL
+                WHERE id = ?
+                """.trimIndent(),
+                listOf(wishlistItemId)
+            )
+        }
+    }
+
     suspend fun deleteItem(wishlistItemId: UUID) {
         db.asyncConnection {
             executeUpdate(
