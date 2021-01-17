@@ -11,14 +11,15 @@ import kotlinx.serialization.UseSerializers
 import java.util.UUID
 
 @Serializable
-private class WishlistItemReq(val title: String, val description: String, val user: UUID) {
-    val value: WishlistItem get() = WishlistItem(
-        id = UUID.randomUUID(),
-        title = title,
-        description = description,
-        takenBy = null,
-        user = user
-    )
+private class WishlistItemReq(val id: UUID?, val title: String, val description: String, val user: UUID) {
+    val value: WishlistItem
+        get() = WishlistItem(
+            id = id ?: UUID.randomUUID(),
+            title = title,
+            description = description,
+            takenBy = null,
+            user = user
+        )
 }
 
 @Serializable

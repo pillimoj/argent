@@ -13,10 +13,10 @@ import kotlinx.serialization.UseSerializers
 import java.util.UUID
 
 @Serializable
-private class AddUserReq(private val userName: String, private val email: String) {
+private class AddUserReq(val id: UUID?, val userName: String, val email: String) {
     val value: User
         get() = User(
-            id = UUID.randomUUID(),
+            id = id ?: UUID.randomUUID(),
             name = userName,
             email = email,
             role = UserRole.User
@@ -29,6 +29,7 @@ class ShareRequest(val userId: UUID, val accessType: ChecklistAccessType) {
         suspend fun deserialize(call: ApplicationCall): ShareRequest = call.receive()
     }
 }
+
 suspend fun User.Companion.deserialize(call: ApplicationCall) = call.receive<AddUserReq>().value
 
 @Serializable
