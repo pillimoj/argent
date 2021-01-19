@@ -35,7 +35,7 @@ class WishlistDataStore(private val db: DataSource) : DatabaseQueries {
                 SELECT
                     id,
                     title,
-                    description
+                    description,
                     taken_by,
                     argent_user
                 FROM wishlist_items
@@ -73,16 +73,37 @@ class WishlistDataStore(private val db: DataSource) : DatabaseQueries {
                 INSERT INTO wishlist_items (
                     id,
                     title,
+                    description,
                     taken_by,
                     argent_user
                 )
-                VALUES (?,?,?,?)
+                VALUES (?,?,?,?,?)
                 """.trimIndent(),
                 listOf(
                     wishlistItem.id,
                     wishlistItem.title,
+                    wishlistItem.description,
                     wishlistItem.takenBy,
                     wishlistItem.user
+                )
+            )
+        }
+    }
+
+    suspend fun updateItem(wishlistItem: WishlistItem) {
+        return db.asyncConnection {
+            executeUpdate(
+                """
+                UPDATE wishlist_items
+                SET
+                    title = ?,
+                    description = ?
+                WHERE id = ?
+                """.trimIndent(),
+                listOf(
+                    wishlistItem.title,
+                    wishlistItem.description,
+                    wishlistItem.id,
                 )
             )
         }
@@ -93,7 +114,7 @@ class WishlistDataStore(private val db: DataSource) : DatabaseQueries {
             executeUpdate(
                 """
                 UPDATE wishlist_items
-                SET taken_by = ?
+                    SET taken_by = ?
                 WHERE id = ?
                 """.trimIndent(),
                 listOf(takenBy.id, wishlistItemId)
@@ -106,7 +127,7 @@ class WishlistDataStore(private val db: DataSource) : DatabaseQueries {
             executeUpdate(
                 """
                 UPDATE wishlist_items
-                SET taken_by = NULL
+                    SET taken_by = NULL
                 WHERE id = ?
                 """.trimIndent(),
                 listOf(wishlistItemId)

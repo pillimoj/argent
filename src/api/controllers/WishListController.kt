@@ -7,6 +7,7 @@ import argent.api.serialization.WishlistShareRequest
 import argent.api.serialization.deserialize
 import argent.data.wishlists.WishlistDataStore
 import argent.data.wishlists.WishlistItem
+import argent.server.BadRequestException
 import argent.server.ForbiddenException
 import argent.server.NotFoundException
 import argent.util.pathIdParam
@@ -36,6 +37,20 @@ class WishListController(wishlistDataStore: WishlistDataStore) {
             throw ForbiddenException()
         }
         wishlistDataStore.deleteItem(wishlistItem.id)
+        call.respondOk()
+    }
+
+    val editWishlistItem = authedHandler(HttpMethod.Post) { user ->
+        val itemId = pathIdParam()
+        val wishlistItem = wishlistDataStore.getWishlistItem(itemId) ?: throw NotFoundException()
+        if (wishlistItem.user != user.id) {
+            throw ForbiddenException()
+        }
+        val updatedWishlistItem = WishlistItem.deserialize(call)
+        if (updatedWishlistItem.id != wishlistItem.id) {
+            throw BadRequestException()
+        }
+        wishlistDataStore.updateItem(updatedWishlistItem)
         call.respondOk()
     }
 

@@ -42,6 +42,7 @@ fun Route.v1Routes(
             post(wishListController.addWishListItem)
             route("{id}") {
                 delete(wishListController.deleteWishListItem)
+                post(wishListController.editWishlistItem)
                 post("take", wishListController.takeItem)
                 post("release", wishListController.releaseItem)
             }
