@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("plugin.serialization") version "1.4.21"
     kotlin("jvm") version "1.4.21"
@@ -102,23 +100,30 @@ jib {
     }
 }
 
-val test = tasks.withType<Test> {
-    getEnvVariables().forEach { environment(it.key, it.value) }
-    useJUnitPlatform {}
-    testLogging {
-        events("passed", "skipped", "failed")
+tasks {
+    test {
+        getEnvVariables().forEach { environment(it.key, it.value) }
+        useJUnitPlatform {}
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
+    val run by existing(JavaExec::class) {
+        this.systemProperties["io.ktor.development"] = getEnvVariables()["ARGENT_DEBUG"] == "true"
+        getEnvVariables().forEach { environment(it.key, it.value) }
+        dependsOn(ktlintFormat)
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = "11"
+        dependsOn(ktlintCheck)
+    }
+
+    ktlintCheck {
+        mustRunAfter(ktlintFormat)
     }
 }
 
-tasks.getByName<JavaExec>("run") {
-    this.systemProperties["io.ktor.development"] = getEnvVariables()["ARGENT_DEBUG"] == "true"
-    getEnvVariables().forEach { environment(it.key, it.value) }
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
-    dependsOn("ktlintCheck")
-}
 
 fun getEnvVariables(): Map<String, String> {
     return File("$projectDir/.env")
