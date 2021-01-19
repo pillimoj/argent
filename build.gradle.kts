@@ -122,8 +122,10 @@ tasks {
     ktlintCheck {
         mustRunAfter(ktlintFormat)
     }
+    ktlintKotlinScriptCheck {
+        mustRunAfter(ktlintKotlinScriptFormat)
+    }
 }
-
 
 fun getEnvVariables(): Map<String, String> {
     return File("$projectDir/.env")
