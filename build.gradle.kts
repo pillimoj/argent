@@ -53,7 +53,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktorVersion")
 
     // Json
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.2.3")

@@ -11,6 +11,7 @@ import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.path
 import io.ktor.response.respond
+import kotlinx.serialization.SerializationException
 import org.slf4j.Logger
 
 fun ApiException.errorMessage() = ErrorMessage(this.clientMessage)
@@ -26,6 +27,11 @@ fun Application.installErrorHandling() {
         exception<ApiException> { cause ->
             logger.apiException(cause)
             call.respond(HttpStatusCode.fromValue(cause.statusCode), cause.errorMessage())
+        }
+
+        exception<SerializationException> { cause ->
+            logger.error("Ktor caught SerializationException", cause)
+            call.respond(HttpStatusCode.BadRequest, ErrorMessage(cause.toString()))
         }
 
         exception<Exception> {

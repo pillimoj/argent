@@ -14,16 +14,16 @@ import kotlinx.serialization.UseSerializers
 import java.util.UUID
 
 @Serializable
-private class ChecklistReq(val id: UUID?, val name: String) {
+private class ChecklistReq(val id: UUID? = null, val name: String) {
     val value: Checklist get() = Checklist(id = id ?: UUID.randomUUID(), name = name)
 }
 
 @Serializable
 private class ChecklistItemReq(
-    val id: UUID?,
+    val id: UUID? = null,
     val title: String,
     val checklist: UUID,
-    val createdAt: GMTDate?
+    val createdAt: GMTDate? = null
 ) {
     val value: ChecklistItem
         get() = ChecklistItem(

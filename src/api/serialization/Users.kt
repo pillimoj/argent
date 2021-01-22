@@ -13,7 +13,7 @@ import kotlinx.serialization.UseSerializers
 import java.util.UUID
 
 @Serializable
-private class AddUserReq(val id: UUID?, val userName: String, val email: String) {
+private class AddUserReq(val id: UUID? = null, val userName: String, val email: String) {
     val value: User
         get() = User(
             id = id ?: UUID.randomUUID(),
