@@ -15,10 +15,6 @@ val image = "argent"
 group = "Argent"
 version = "1.0-SNAPSHOT"
 
-application {
-    mainClassName = argentMainClass
-}
-
 kotlin.sourceSets {
     main {
         kotlin.srcDir("src")
@@ -27,11 +23,6 @@ kotlin.sourceSets {
     test {
         kotlin.srcDir("test")
         resources.srcDir("testresources")
-    }
-}
-sourceSets {
-    main {
-        resources { srcDir("resources") }
     }
 }
 
@@ -78,6 +69,39 @@ dependencies {
     testImplementation("com.github.javafaker:javafaker:1.0.2")
 }
 
+tasks {
+    test {
+        getEnvVariables().forEach { environment(it.key, it.value) }
+        useJUnitPlatform {}
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
+    val run by existing(JavaExec::class) {
+        val envVars = getEnvVariables()
+        this.systemProperties["io.ktor.development"] = envVars["ARGENT_DEBUG"] == "true"
+        envVars.forEach { environment(it.key, it.value) }
+        dependsOn(ktlintFormat)
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = "11"
+        dependsOn(ktlintCheck)
+    }
+
+    ktlintCheck {
+        mustRunAfter(ktlintFormat)
+    }
+    ktlintKotlinScriptCheck {
+        mustRunAfter(ktlintKotlinScriptFormat)
+    }
+}
+
+// PLUGINS
+application {
+    mainClass.set(argentMainClass)
+}
+
 jib {
     from.image = "gcr.io/distroless/java:11"
     container {
@@ -100,33 +124,7 @@ jib {
     }
 }
 
-tasks {
-    test {
-        getEnvVariables().forEach { environment(it.key, it.value) }
-        useJUnitPlatform {}
-        testLogging {
-            events("passed", "skipped", "failed")
-        }
-    }
-    val run by existing(JavaExec::class) {
-        this.systemProperties["io.ktor.development"] = getEnvVariables()["ARGENT_DEBUG"] == "true"
-        getEnvVariables().forEach { environment(it.key, it.value) }
-        dependsOn(ktlintFormat)
-    }
-
-    compileKotlin {
-        kotlinOptions.jvmTarget = "11"
-        dependsOn(ktlintCheck)
-    }
-
-    ktlintCheck {
-        mustRunAfter(ktlintFormat)
-    }
-    ktlintKotlinScriptCheck {
-        mustRunAfter(ktlintKotlinScriptFormat)
-    }
-}
-
+// HELPERS
 fun getEnvVariables(): Map<String, String> {
     return File("$projectDir/.env")
         .takeIf { it.exists() }
