@@ -26,6 +26,20 @@ class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
         }
     }
 
+    suspend fun getChecklist(checklistId: UUID): Checklist? {
+        return db.asyncConnection {
+            executeQuery(
+                """
+                SELECT id, name
+                FROM checklists
+                WHERE id = ?
+                """.trimIndent(),
+                listOf(checklistId),
+                parse { Checklist(it) }
+            )
+        }
+    }
+
     suspend fun getChecklistItems(checklistId: UUID): List<ChecklistItem> {
         return db.asyncConnection {
             executeQuery(

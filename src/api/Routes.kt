@@ -23,7 +23,8 @@ fun Route.v1Routes(
             post(checklistController.checklists.create)
             get(checklistController.checklists.getAll)
             route("{id}") {
-                get(checklistController.checklists.getItems)
+                get(checklistController.checklists.getById)
+                get("items", checklistController.checklists.getItems)
                 delete(checklistController.checklists.delete)
                 post("clear-done", checklistController.checklists.clearDone)
                 post("share", checklistController.checklists.share)

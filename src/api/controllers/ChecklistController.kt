@@ -57,6 +57,15 @@ class ChecklistController(private val checklistDataStore: ChecklistDataStore, pr
             call.respond(checklists)
         }
 
+        val getById = authedHandler(HttpMethod.Get) { user ->
+            val id = pathIdParam()
+            if (!hasAccess(id, user)) {
+                throw ForbiddenException()
+            }
+            val checklist = checklistDataStore.getChecklist(id)!!
+            call.respond(checklist)
+        }
+
         val getItems = authedHandler(HttpMethod.Get) { user ->
             val id = pathIdParam()
             if (!hasAccess(id, user)) {
