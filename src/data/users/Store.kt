@@ -1,7 +1,7 @@
 package argent.data.users
 
-import argent.data.DatabaseQueries
-import argent.data.asyncConnection
+import com.grimsborn.database.DatabaseQueries
+import com.grimsborn.database.asyncConnection
 import java.util.UUID
 import javax.sql.DataSource
 

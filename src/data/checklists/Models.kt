@@ -2,11 +2,12 @@
 
 package argent.data.checklists
 
-import argent.data.getLocalDateTime
-import argent.data.getUUID
+
 import argent.util.GMTDateSerializer
 import argent.util.UUIDSerializer
 import argent.util.toGMTDate
+import com.grimsborn.database.getLocalDateTime
+import com.grimsborn.database.getUUID
 import io.ktor.util.date.GMTDate
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers

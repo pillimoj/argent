@@ -8,8 +8,6 @@ plugins {
 
 val ktorVersion = "1.5.0"
 val argentMainClass = "argent.MainKt"
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-
 val image = "argent"
 
 group = "Argent"
@@ -26,10 +24,18 @@ kotlin.sourceSets {
     }
 }
 
+val githubUser: String by project
+val githubToken: String by project
 repositories {
-    jcenter()
-    mavenCentral()
-    maven(url = "https://jitpack.io")
+    mavenCentral {
+        content { excludeGroup("com.grimsborn") }
+    }
+    maven {
+        name = "GitHubPackages"
+        githubAuth()
+        url = uri("https://maven.pkg.github.com/pillimoj/grimsborn-database")
+        // content { includeModule("com.grimsborn", "database") }
+    }
 }
 
 dependencies {
@@ -51,6 +57,7 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:6.3")
 
     // Database
+    implementation("com.grimsborn:database:[1.1.1, 2.0)")
     implementation("com.zaxxer:HikariCP:3.4.5")
     implementation("org.postgresql:postgresql:42.2.18")
     implementation("org.flywaydb:flyway-core:6.2.4")
@@ -86,14 +93,6 @@ tasks {
 
     compileKotlin {
         kotlinOptions.jvmTarget = "11"
-        dependsOn(ktlintCheck)
-    }
-
-    ktlintCheck {
-        mustRunAfter(ktlintFormat)
-    }
-    ktlintKotlinScriptCheck {
-        mustRunAfter(ktlintKotlinScriptFormat)
     }
 }
 
@@ -133,4 +132,11 @@ fun getEnvVariables(): Map<String, String> {
         ?.map { it.split("=").zipWithNext().first() }
         ?.filter { System.getenv(it.first).isNullOrBlank() }
         ?.toMap() ?: emptyMap()
+}
+
+fun org.gradle.api.artifacts.repositories.MavenArtifactRepository.githubAuth() {
+    credentials {
+        username = System.getenv("GTIHUB_ACTOR") ?: githubUser
+        password = System.getenv("GITHUB_TOKEN") ?: githubToken
+    }
 }

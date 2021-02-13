@@ -2,10 +2,10 @@
 
 package argent.data.wishlists
 
-import argent.data.getUUID
-import argent.data.getUUIDOrNull
 import argent.util.GMTDateSerializer
 import argent.util.UUIDSerializer
+import com.grimsborn.database.getUUID
+import com.grimsborn.database.getUUIDOrNull
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.sql.ResultSet

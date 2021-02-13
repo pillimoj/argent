@@ -1,8 +1,8 @@
 package argent.data.wishlists
 
-import argent.data.DatabaseQueries
-import argent.data.asyncConnection
 import argent.data.users.User
+import com.grimsborn.database.DatabaseQueries
+import com.grimsborn.database.asyncConnection
 import java.util.UUID
 import javax.sql.DataSource
 

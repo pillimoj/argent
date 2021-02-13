@@ -1,10 +1,10 @@
 package argent.data.checklists
 
-import argent.data.DatabaseQueries
-import argent.data.asyncConnection
 import argent.data.users.User
 import argent.util.asEnum
 import argent.util.toLocalDateTime
+import com.grimsborn.database.DatabaseQueries
+import com.grimsborn.database.asyncConnection
 import java.util.UUID
 import javax.sql.DataSource
 
