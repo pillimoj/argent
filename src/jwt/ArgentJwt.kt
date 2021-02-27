@@ -1,6 +1,7 @@
 package argent.jwt
 
 import argent.data.users.User
+import argent.server.Config
 import argent.server.UnauthorizedException
 import argent.util.argentJson
 import com.auth0.jwt.JWT
@@ -15,7 +16,7 @@ private fun dateInFutureMinutes(minutesInFuture: Int): Date {
     return result
 }
 object ArgentJwt {
-    private val algorithm = Algorithm.HMAC256("secret")
+    private val algorithm = Algorithm.HMAC256(Config.authentication.jwtKey)
     private val verifier = JWT.require(algorithm)
         .withIssuer(issuer)
         .build() // Reusable verifier instance
