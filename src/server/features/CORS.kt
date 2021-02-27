@@ -19,7 +19,6 @@ fun Application.installCORS() {
         header(HttpHeaders.Authorization)
         host("localhost:5000")
         host("argent.grimsborn.com", schemes = listOf("https"))
-        host("grimsborn.web.app", schemes = listOf("https"))
         allowCredentials = true
         allowNonSimpleContentTypes = true
         exposeHeader("X-Request-ID")
