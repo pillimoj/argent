@@ -23,4 +23,4 @@ rundocker:
 
 deploy: buildproductionimage
 	$(eval IMAGE_DIGEST := $(shell jq -r .image build/jib-image.json)@$(shell cat build/jib-image.digest))
-	gcloud run --platform=managed --region=europe-west1 deploy argent --image=${IMAGE_DIGEST}
+	gcloud run deploy argent --image=${IMAGE_DIGEST} --platform=managed --region=europe-west1
