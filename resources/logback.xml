@@ -24,17 +24,8 @@
         </encoder>
     </appender>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
-
-    <logger name="org.eclipse.jetty" level="INFO"/>
-    <logger name="io.netty" level="INFO"/>
-    <logger name="ktor.application" level="INFO"/>
-    <logger name="com.mchange.v2" level="INFO"/>
-    <logger name="io.swagger" level="INFO"/>
-    <logger name="org.flywaydb" level="INFO"/>
-    <logger name="io.grpc" level="INFO"/>
-    <logger name="com.zaxxer.hikari" level="INFO"/>
-
+    <!-- <logger name="argent" level="DEBUG"/> -->
 </configuration>

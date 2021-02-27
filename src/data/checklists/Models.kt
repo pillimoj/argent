@@ -2,7 +2,6 @@
 
 package argent.data.checklists
 
-
 import argent.util.GMTDateSerializer
 import argent.util.UUIDSerializer
 import argent.util.toGMTDate
