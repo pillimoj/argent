@@ -92,7 +92,7 @@ tasks {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "15"
     }
 }
 
@@ -102,7 +102,7 @@ application {
 }
 
 jib {
-    from.image = "gcr.io/distroless/java:11"
+    from.image = "openjdk:15"
     container {
         ports = listOf("80")
         mainClass = argentMainClass
