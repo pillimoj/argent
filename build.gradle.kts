@@ -61,7 +61,7 @@ dependencies {
     implementation("org.flywaydb:flyway-core:6.2.4")
 
     // Google
-    implementation("com.google.cloud:google-cloud-secretmanager:1.0.0")
+    implementation("com.google.cloud:google-cloud-secretmanager:1.4.0")
     implementation("com.google.cloud.sql:postgres-socket-factory:1.2.0")
 
     // JWT
