@@ -14,14 +14,12 @@ group = "Argent"
 version = "1.0-SNAPSHOT"
 
 kotlin.sourceSets {
-    main {
-        kotlin.srcDir("src")
-        resources.srcDir("resources")
-    }
-    test {
-        kotlin.srcDir("test")
-        resources.srcDir("testresources")
-    }
+    main { kotlin.srcDir("src") }
+    test { kotlin.srcDir("test") }
+}
+sourceSets {
+    main { resources.srcDir("resources") }
+    test { resources.srcDir("testresources") }
 }
 
 val githubUser: String by project
