@@ -55,8 +55,8 @@ fun Authentication.Configuration.argentAuthJwt(
     provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
         try {
             val argentToken = call.request.cookies[Config.authentication.cookieName] ?: throw UnauthorizedException()
-            val userFromToken = ArgentJwt.validateToken(argentToken)
-            context.principal(userFromToken)
+            val validationResult = ArgentJwt.validateToken(argentToken)
+            context.principal(validationResult.user)
             return@intercept
         } catch (e: Exception) {
             if (e is ApiException) {

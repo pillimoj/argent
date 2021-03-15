@@ -6,7 +6,10 @@ import argent.server.UnauthorizedException
 import argent.util.argentJson
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.interfaces.DecodedJWT
 import java.util.Date
+
+data class TokenValidationResult(val token: DecodedJWT, val user: User)
 
 private const val MINUTE_MILLIS = 60L * 1000
 private const val issuer = "argent"
@@ -27,9 +30,10 @@ object ArgentJwt {
         .withExpiresAt(dateInFutureMinutes(30))
         .sign(algorithm)
 
-    fun validateToken(token: String): User {
+    fun validateToken(token: String): TokenValidationResult {
         val validToken = verifier.verify(token) ?: throw UnauthorizedException()
         val userClaim = validToken.getClaim("argent_user").asString()
-        return argentJson.decodeFromString(User.serializer(), userClaim)
+        val user = argentJson.decodeFromString(User.serializer(), userClaim)
+        return TokenValidationResult(validToken, user)
     }
 }
