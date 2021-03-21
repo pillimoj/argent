@@ -2,6 +2,7 @@ package argent.api
 
 import argent.api.controllers.AdminController
 import argent.api.controllers.ChecklistController
+import argent.api.controllers.GameController
 import argent.api.controllers.UsersController
 import argent.api.controllers.WishListController
 import io.ktor.auth.authenticate
@@ -15,7 +16,8 @@ fun Route.v1Routes(
     checklistController: ChecklistController,
     wishListController: WishListController,
     usersController: UsersController,
-    adminController: AdminController
+    adminController: AdminController,
+    gameController: GameController,
 ) {
     authenticate {
         get("me", checklistController.me)
@@ -63,6 +65,10 @@ fun Route.v1Routes(
             get(adminController.getAllUsers)
             post(adminController.addUser)
             delete("{id}", adminController.deleteUser)
+        }
+        route("marble-game") {
+            get("status", gameController.getStatus)
+            post("set-highest-cleared", gameController.setHighestCleared)
         }
     } // end authenticate
     get("login", usersController.login)
