@@ -6,16 +6,16 @@ import com.grimsborn.database.asyncConnection
 import javax.sql.DataSource
 
 class ChatStore(private val db: DataSource) : DatabaseQueries {
-    suspend fun getMessages(): List<ChatMessage> {
+    suspend fun getMessages(maxMessages: Int = 100): List<ChatMessage> {
         return db.asyncConnection {
             executeQuery(
                 """
                 SELECT id, sender_id, sender, message_text, created_date
                 FROM chat_messages
                 ORDER BY created_date DESC
-                LIMIT 20
+                LIMIT ?
                 """.trimIndent(),
-                emptyList(),
+                listOf(maxMessages),
                 parseList { ChatMessage(it) }
             ).reversed()
         }
