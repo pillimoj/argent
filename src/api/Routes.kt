@@ -5,6 +5,8 @@ import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
 import argent.api.controllers.UsersController
 import argent.api.controllers.WishListController
+import argent.chat.ChatStore
+import argent.chat.chat
 import io.ktor.auth.authenticate
 import io.ktor.routing.Route
 import io.ktor.routing.delete
@@ -18,6 +20,7 @@ fun Route.v1Routes(
     usersController: UsersController,
     adminController: AdminController,
     gameController: GameController,
+    chatStore: ChatStore,
 ) {
     authenticate {
         get("me", checklistController.me)
@@ -70,6 +73,7 @@ fun Route.v1Routes(
             get("status", gameController.getStatus)
             post("set-highest-cleared", gameController.setHighestCleared)
         }
+        chat(chatStore)
     } // end authenticate
     get("login", usersController.login)
     get("logout", usersController.logout)

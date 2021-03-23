@@ -6,6 +6,7 @@ import argent.api.serialization.UserForSharing
 import argent.api.unAuthedHandler
 import argent.data.users.User
 import argent.data.users.UserDataStore
+import argent.data.users.UserRole
 import argent.google.getGoogleToken
 import argent.jwt.ArgentJwt
 import argent.server.ForbiddenException
@@ -15,6 +16,7 @@ import argent.server.features.createExpiredCookie
 import io.ktor.application.call
 import io.ktor.http.HttpMethod
 import io.ktor.response.respond
+import java.util.UUID
 
 class UsersController(private val userDataStore: UserDataStore) {
     val getAll = authedHandler(HttpMethod.Get) {

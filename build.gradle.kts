@@ -46,6 +46,7 @@ dependencies {
     implementation("io.ktor:ktor-auth:$ktorVersion")
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-websockets:$ktorVersion")
 
     // Json
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
