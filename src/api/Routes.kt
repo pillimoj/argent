@@ -1,18 +1,18 @@
 package argent.api
 
 import argent.api.controllers.AdminController
+import argent.api.controllers.ChatController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
 import argent.api.controllers.UsersController
 import argent.api.controllers.WishListController
-import argent.chat.ChatStore
-import argent.chat.chat
 import io.ktor.auth.authenticate
 import io.ktor.routing.Route
 import io.ktor.routing.delete
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.route
+import io.ktor.websocket.webSocket
 
 fun Route.v1Routes(
     checklistController: ChecklistController,
@@ -20,7 +20,7 @@ fun Route.v1Routes(
     usersController: UsersController,
     adminController: AdminController,
     gameController: GameController,
-    chatStore: ChatStore,
+    chatController: ChatController,
 ) {
     authenticate {
         get("me", checklistController.me)
@@ -73,7 +73,9 @@ fun Route.v1Routes(
             get("status", gameController.getStatus)
             post("set-highest-cleared", gameController.setHighestCleared)
         }
-        chat(chatStore)
+        route("chat"){
+            webSocket(protocol=null, chatController.chatHandler)
+        }
     } // end authenticate
     get("login", usersController.login)
     get("logout", usersController.logout)

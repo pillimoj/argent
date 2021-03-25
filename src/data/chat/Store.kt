@@ -1,4 +1,4 @@
-package argent.chat
+package argent.data.chat
 
 import argent.util.toLocalDateTime
 import com.grimsborn.database.DatabaseQueries

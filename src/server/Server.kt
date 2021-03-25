@@ -1,13 +1,14 @@
 package argent.server
 
 import argent.api.controllers.AdminController
+import argent.api.controllers.ChatController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
 import argent.api.controllers.UsersController
 import argent.api.controllers.UtilController
 import argent.api.controllers.WishListController
 import argent.api.v1Routes
-import argent.chat.ChatStore
+import argent.data.chat.ChatStore
 import argent.data.checklists.ChecklistDataStore
 import argent.data.game.GameDatastore
 import argent.data.users.UserDataStore
@@ -46,6 +47,7 @@ fun Application.main() {
     val wishListController = WishListController(wishlistDataStore)
     val usersController = UsersController(userDataStore)
     val gameController = GameController(gameDataStore)
+    val chatController = ChatController(chatStore)
 
     val configureAuth: Authentication.Configuration.() -> Unit = { argentAuthJwt { } }
 
@@ -55,7 +57,7 @@ fun Application.main() {
         usersController,
         adminController,
         gameController,
-        chatStore,
+        chatController,
         configureAuth
     )
 }
@@ -66,7 +68,7 @@ fun Application.mainWithOverrides(
     usersController: UsersController,
     adminController: AdminController,
     gameController: GameController,
-    chatStore: ChatStore,
+    chatController: ChatController,
     configureAuth: Authentication.Configuration.() -> Unit
 ) {
     installCallLogging()
@@ -96,7 +98,7 @@ fun Application.mainWithOverrides(
                 usersController,
                 adminController,
                 gameController,
-                chatStore
+                chatController,
             )
         }
     }

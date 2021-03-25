@@ -1,5 +1,6 @@
 @file:UseSerializers(GMTDateSerializer::class, UUIDSerializer::class)
-package argent.chat
+
+package argent.data.chat
 
 import argent.data.users.User
 import argent.util.GMTDateSerializer
