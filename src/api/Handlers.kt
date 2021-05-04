@@ -9,6 +9,8 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.auth.principal
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
 
 typealias CallContext = PipelineContext<Unit, ApplicationCall>
@@ -33,4 +35,10 @@ fun adminHandler(method: HttpMethod, block: PrincipalHandler): RouteHandler = {
         throw ForbiddenException()
     }
     block(principal)
+}
+
+fun notImplementedAuthedHandler(method: HttpMethod): RouteHandler = {
+    requireMethod(method)
+    call.principal<User>() ?: throw InternalServerError("No principal in api handler")
+    call.respond(HttpStatusCode.NotImplemented)
 }

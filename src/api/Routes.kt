@@ -4,8 +4,8 @@ import argent.api.controllers.AdminController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
 import argent.api.controllers.UsersController
-import argent.api.controllers.WishListController
 import io.ktor.auth.authenticate
+import io.ktor.http.HttpMethod
 import io.ktor.routing.Route
 import io.ktor.routing.delete
 import io.ktor.routing.get
@@ -14,7 +14,6 @@ import io.ktor.routing.route
 
 fun Route.v1Routes(
     checklistController: ChecklistController,
-    wishListController: WishListController,
     usersController: UsersController,
     adminController: AdminController,
     gameController: GameController,
@@ -41,21 +40,15 @@ fun Route.v1Routes(
                 post("not-done", checklistController.checklistItems.setNotDone)
             }
         }
-        route("wishlist-items") {
-            post(wishListController.addWishListItem)
-            route("{id}") {
-                delete(wishListController.deleteWishListItem)
-                post(wishListController.editWishlistItem)
-                post("take", wishListController.takeItem)
-                post("release", wishListController.releaseItem)
-            }
+        route("wishlist-items/{...}") {
+            get(notImplementedAuthedHandler(HttpMethod.Get))
+            post(notImplementedAuthedHandler(HttpMethod.Get))
+            delete(notImplementedAuthedHandler(HttpMethod.Get))
         }
-        route("wishlists") {
-            get(wishListController.getAvailableWishlistsUsers)
-            get("me", wishListController.getOwnItems)
-            get("shared-with", wishListController.getUsersWithAccess)
-            post("share", wishListController.shareWithUser)
-            get("{id}", wishListController.getItemsForUser)
+        route("wishlists/{...}") {
+            get(notImplementedAuthedHandler(HttpMethod.Get))
+            post(notImplementedAuthedHandler(HttpMethod.Get))
+            delete(notImplementedAuthedHandler(HttpMethod.Get))
         }
         route("users") {
             get(usersController.getAll)

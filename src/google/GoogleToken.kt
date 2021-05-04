@@ -1,18 +1,17 @@
 package argent.google
 
-import argent.util.argentJson
+import argent.util.defaultObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.application.ApplicationCall
 import io.ktor.http.HttpHeaders
 import io.ktor.request.header
-import kotlinx.serialization.Serializable
 
-@Serializable
 class GoogleToken(
     val email: String,
 )
 
 private fun String.asToken(): GoogleToken {
-    return argentJson.decodeFromString(GoogleToken.serializer(), this)
+    return defaultObjectMapper.readValue(this)
 }
 
 fun ApplicationCall.getGoogleToken(): GoogleToken? {

@@ -1,13 +1,12 @@
 import argent.api.controllers.AdminController
 import argent.api.controllers.ChecklistController
+import argent.api.controllers.GameController
 import argent.api.controllers.UsersController
-import argent.api.controllers.WishListController
 import argent.data.checklists.ChecklistDataStore
-import argent.data.runMigrations
+import argent.data.game.GameDatastore
 import argent.data.users.User
 import argent.data.users.UserDataStore
-import argent.data.wishlists.WishlistDataStore
-import argent.server.DataBases
+import argent.google.ArgentStore
 import argent.server.mainWithOverrides
 import io.ktor.auth.Authentication
 import io.ktor.server.testing.TestApplicationEngine
@@ -17,37 +16,37 @@ import kotlinx.coroutines.runBlocking
 interface ApplicationContext {
     val authenticatedUser: User
     val checklistDataStore: ChecklistDataStore
-    val wishlistDataStore: WishlistDataStore
     val userDataStore: UserDataStore
+    val gameDataStore: GameDatastore
 
     val checklistController: ChecklistController
-    val wishListController: WishListController
     val adminController: AdminController
     val usersController: UsersController
+    val gameController: GameController
     val configureAuth: Authentication.Configuration.() -> Unit
     fun <T> testMain(callback: TestApplicationEngine.() -> T): T {
         return withTestApplication({
-            mainWithOverrides(checklistController, wishListController, usersController, adminController, configureAuth)
+            mainWithOverrides(checklistController, usersController, adminController, gameController, configureAuth)
         }) { callback() }
     }
 }
 
 fun defaultApplicationContext(authenticatedUser: User) = object : ApplicationContext {
+    private val db = ArgentStore()
     override val authenticatedUser = authenticatedUser
-    override val checklistDataStore = ChecklistDataStore(DataBases.Argent.dbPool)
-    override val wishlistDataStore = WishlistDataStore(DataBases.Argent.dbPool)
-    override val userDataStore = UserDataStore(DataBases.Argent.dbPool)
+    override val checklistDataStore = ChecklistDataStore(db)
+    override val userDataStore = UserDataStore(db)
+    override val gameDataStore = GameDatastore(db)
 
     override val checklistController = ChecklistController(checklistDataStore, userDataStore)
-    override val wishListController = WishListController(wishlistDataStore)
     override val adminController = AdminController(userDataStore)
     override val usersController = UsersController(userDataStore)
+    override val gameController = GameController(gameDataStore)
     override val configureAuth: Authentication.Configuration.() -> Unit = {
         testAuth { user = authenticatedUser }
     }
 
     init {
-        runMigrations(DataBases.Argent.dbPool)
         runBlocking {
             if (null == userDataStore.getUserForEmail(authenticatedUser.email)) {
                 userDataStore.addUser(authenticatedUser)

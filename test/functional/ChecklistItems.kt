@@ -30,14 +30,14 @@ class ChecklistItemsTest : ApplicationTest {
             checklistDataStore.addItem(item)
             item
         }.random().let {
-            checklistDataStore.setItemDone(it.id, true)
+            checklistDataStore.setItemDone(it.checklistItem, true)
         }
         (1..5).map {
             val item = ChecklistItem(UUID.randomUUID(), Faker.elderScrolls().dragon(), false, cl2.id, GMTDate())
             checklistDataStore.addItem(item)
             item
         }.random().let {
-            checklistDataStore.setItemDone(it.id, true)
+            checklistDataStore.setItemDone(it.checklistItem, true)
         }
         checklistDataStore.clearDone(cl2.id)
         val items1 = checklistDataStore.getChecklistItems(cl1.id)

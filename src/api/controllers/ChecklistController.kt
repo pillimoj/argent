@@ -99,7 +99,7 @@ class ChecklistController(private val checklistDataStore: ChecklistDataStore, pr
             val userId = pathIdParam("userId")
             val checklistOwners = userDataStore.getUsersForChecklist(checklistId)
                 .filter { it.checklistAccessType == ChecklistAccessType.Owner }
-            if (checklistOwners.size == 1 && checklistOwners.first().id == userId) {
+            if (checklistOwners.size == 1 && checklistOwners.first().user == userId) {
                 throw BadRequestException("Cannot remove lst owner of a list")
             }
             if (!isOwner(checklistId, user)) {
