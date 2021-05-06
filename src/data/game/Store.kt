@@ -9,7 +9,7 @@ class GameDatastore(private val db: ArgentStore) {
 
     suspend fun getStatusForUser(user: User): GameStatus {
         val userDocRef = db.users.document(user.user.toString()).get().await()
-        if(!userDocRef.exists()) throw InternalServerError("No user found in db when getting game status for user")
+        if (!userDocRef.exists()) throw InternalServerError("No user found in db when getting game status for user")
         val highestCleared = userDocRef.get("highestCleared", Int::class.java)
         return GameStatus(user.user, highestCleared ?: 0)
     }

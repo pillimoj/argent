@@ -20,7 +20,6 @@ typealias PrincipalHandler = suspend CallContext.(User) -> Unit
 typealias WsHandler = suspend DefaultWebSocketServerSession.() -> Unit
 typealias PrincipalWsHandler = suspend DefaultWebSocketServerSession.(User) -> Unit
 
-
 fun unAuthedHandler(method: HttpMethod, block: RouteHandler): RouteHandler = {
     requireMethod(method)
     block(Unit)

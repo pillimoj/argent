@@ -66,8 +66,8 @@ fun Route.v1Routes(
             get("status", gameController.getStatus)
             post("set-highest-cleared", gameController.setHighestCleared)
         }
-        route("chat"){
-            webSocket(protocol=null, chatController.chatHandler)
+        route("chat") {
+            webSocket(protocol = null, chatController.chatHandler)
         }
     } // end authenticate
     get("login", usersController.login)
