@@ -3,7 +3,7 @@ package argent.data.chat
 import argent.data.users.User
 import argent.util.defaultObjectMapper
 import io.ktor.http.cio.websocket.Frame
-import io.ktor.util.date.GMTDate
+import java.time.Instant
 import java.util.UUID
 
 enum class ChatDataType {
@@ -23,7 +23,7 @@ data class ActiveUsersData(val activeUsers: List<String>, val dataType: ChatData
     }
 }
 
-data class ChatMessage(val id: UUID, val senderId: UUID, val sender: String, val messageText: String, val createdDate: GMTDate) {
+data class ChatMessage(val id: UUID, val senderId: UUID, val sender: String, val messageText: String, val createdDate: Instant) {
 
     fun toFrame(): Frame.Text {
         return MessagesData(listOf(this)).toFrame()
@@ -35,7 +35,7 @@ data class ChatMessage(val id: UUID, val senderId: UUID, val sender: String, val
             senderId = user.user,
             sender = user.name.split(" ").first(),
             messageText = messageText,
-            createdDate = GMTDate()
+            createdDate = Instant.now()
         )
     }
 }

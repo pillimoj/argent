@@ -13,9 +13,12 @@ import java.util.UUID
 class ChecklistDataStore(private val db: ArgentStore) {
 
     suspend fun getChecklistsForUser(user: User): List<Checklist> {
-        val checklistIds = db.userAccess.whereEqualTo("userId", user.user.toString()).select("checklist").get().await().parseList<String>()
-        return db.checklists
-            .whereIn("checklistId", checklistIds.toMutableList())
+        val accessibleChecklistsIds = db.userAccess.whereEqualTo("user", user.user.toString())
+            .get()
+            .await()
+            .parseList<UserAccess>()
+            .map { it.checklist.toString() }
+        return db.checklists.whereIn("checklist", accessibleChecklistsIds)
             .get()
             .await()
             .parseList()
@@ -30,30 +33,38 @@ class ChecklistDataStore(private val db: ArgentStore) {
     }
 
     suspend fun getChecklistItems(checklistId: UUID): List<ChecklistItem> {
-        return db.checklistItems
-            .whereEqualTo("checklist", checklistId.toString())
+        return db.checklistItems(checklistId)
             .get()
             .await()
             .parseList()
     }
 
     suspend fun addChecklist(checklist: Checklist, user: User) {
-        val checklistFuture = db.checklists.document(checklist.id.toString()).set(checklist.storable())
-        val accessFuture = db.userAccess.add(UserAccess(checklist.id, user.user, user.name, ChecklistAccessType.Owner).storable())
+        val checklistFuture = db.checklists.document(checklist.checklist.toString()).set(checklist.storable())
+        val accessFuture = db.userAccess.add(UserAccess(checklist.checklist,
+            user.user,
+            user.name,
+            ChecklistAccessType.Owner).storable())
         checklistFuture.await()
         accessFuture.await()
     }
 
-    suspend fun getItem(itemId: UUID): ChecklistItem? {
-        return db.checklistItems.document(itemId.toString()).get().await().parseOne()
+    suspend fun addChecklistNoAccess(checklist: Checklist) {
+        val checklistFuture = db.checklists.document(checklist.checklist.toString()).set(checklist.storable())
+        checklistFuture.await()
     }
 
-    suspend fun addItem(checklistItem: ChecklistItem) {
-        db.checklistItems.document(checklistItem.checklist.toString()).set(checklistItem.storable()).await()
+    suspend fun getItem(checklistId: UUID, itemId: UUID): ChecklistItem? {
+        return db.checklistItems(checklistId).document(itemId.toString()).get().await().parseOne()
     }
 
-    suspend fun setItemDone(checklistItemId: UUID, isDone: Boolean) {
-        db.checklistItems.document(checklistItemId.toString()).update(mapOf("done" to isDone)).await()
+    suspend fun addItem(checklistId: UUID, checklistItem: ChecklistItem) {
+        db.checklistItems(checklistId).document(checklistItem.checklistItem.toString()).set(checklistItem.storable())
+            .await()
+    }
+
+    suspend fun setItemDone(checklistId: UUID, checklistItemId: UUID, isDone: Boolean) {
+        db.checklistItems(checklistId).document(checklistItemId.toString()).update(mapOf("done" to isDone)).await()
     }
 
     @Suppress("RedundantSuspendModifier")
@@ -62,8 +73,7 @@ class ChecklistDataStore(private val db: ArgentStore) {
     }
 
     suspend fun clearDone(checklistId: UUID) {
-        val deleteFutures = db.checklistItems
-            .whereEqualTo("checklist", checklistId.toString())
+        val deleteFutures = db.checklistItems(checklistId)
             .whereEqualTo("done", true)
             .select("checklistItem")
             .get()
@@ -74,7 +84,7 @@ class ChecklistDataStore(private val db: ArgentStore) {
 
     suspend fun getAccessType(checklistId: UUID, user: User): ChecklistAccessType? {
         return db.userAccess
-            .whereEqualTo("userId", user.user.toString())
+            .whereEqualTo("user", user.user.toString())
             .whereEqualTo("checklist", checklistId.toString())
             .get()
             .await()
@@ -82,10 +92,8 @@ class ChecklistDataStore(private val db: ArgentStore) {
             ?.checklistAccessType
     }
 
-    suspend fun addUserAccess(checklistId: UUID, userId: UUID, accessType: ChecklistAccessType) {
-        val userAccess = UserAccess(checklistId, userId, "", accessType)
+    suspend fun addUserAccess(userAccess: UserAccess) {
         db.userAccess.add(userAccess.storable()).await()
-        TODO("Implement name")
     }
 
     suspend fun removeUserAccess(checklistId: UUID, userId: UUID) {

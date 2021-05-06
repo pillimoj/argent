@@ -1,9 +1,0 @@
-{
-  "database": "argent",
-  "user": "argent",
-  "password": "password",
-  "tcpConf": {
-    "host": "db",
-    "port": 5432
-  }
-}

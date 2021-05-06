@@ -1,6 +1,6 @@
 package argent.data.checklists
 
-import io.ktor.util.date.GMTDate
+import java.time.Instant
 import java.util.UUID
 
 enum class ChecklistAccessType {
@@ -9,7 +9,7 @@ enum class ChecklistAccessType {
 }
 
 data class Checklist(
-    val id: UUID,
+    val checklist: UUID,
     val name: String,
 ) {
     companion object
@@ -19,8 +19,7 @@ data class ChecklistItem(
     val checklistItem: UUID,
     val title: String,
     val done: Boolean,
-    val checklist: UUID,
-    val createdAt: GMTDate,
+    val createdAt: Instant,
 ) {
     companion object
 }

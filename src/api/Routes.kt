@@ -22,25 +22,25 @@ fun Route.v1Routes(
     chatController: ChatController,
 ) {
     authenticate {
-        get("me", checklistController.me)
+        get("me", usersController.me)
         route("checklists") {
             post(checklistController.checklists.create)
             get(checklistController.checklists.getAll)
             route("{id}") {
                 get(checklistController.checklists.getById)
-                get("items", checklistController.checklists.getItems)
+                route("items") {
+                    get(checklistController.checklists.getItems)
+                    post(checklistController.checklistItems.create)
+                    route("{item-id}") {
+                        post("done", checklistController.checklistItems.setDone)
+                        post("not-done", checklistController.checklistItems.setNotDone)
+                    }
+                }
                 delete(checklistController.checklists.delete)
                 post("clear-done", checklistController.checklists.clearDone)
                 post("share", checklistController.checklists.share)
                 post("unshare/{userId}", checklistController.checklists.unShare)
                 get("users", checklistController.checklists.getUsers)
-            }
-        }
-        route("checklistitems") {
-            post(checklistController.checklistItems.create)
-            route("{id}") {
-                post("done", checklistController.checklistItems.setDone)
-                post("not-done", checklistController.checklistItems.setNotDone)
             }
         }
         route("wishlist-items/{...}") {

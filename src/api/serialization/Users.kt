@@ -17,7 +17,7 @@ private class AddUserReq(val id: UUID? = null, val userName: String, val email: 
         )
 }
 
-class ShareRequest(val userId: UUID, val accessType: ChecklistAccessType) {
+class ShareRequest(val user: UUID, val accessType: ChecklistAccessType) {
     companion object {
         suspend fun deserialize(call: ApplicationCall): ShareRequest = call.receive()
     }

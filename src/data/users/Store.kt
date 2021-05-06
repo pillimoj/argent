@@ -13,6 +13,10 @@ class UserDataStore(private val db: ArgentStore) {
         return db.users.whereEqualTo("email", email).get().await().parseOne()
     }
 
+    suspend fun getUser(userId: UUID): User? {
+        return db.users.document(userId.toString()).get().await().parseOne()
+    }
+
     suspend fun getUsersForChecklist(checklistId: UUID): List<UserAccess> {
         val userAccesses = db.userAccess.whereEqualTo("checklist", checklistId).select("user").get().await().parseList<String>().toSet()
         return db.users.whereIn("user", userAccesses.toMutableList()).get().await().parseList()

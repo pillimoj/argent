@@ -50,7 +50,6 @@ fun defaultApplicationContext(authenticatedUser: User) = object : ApplicationCon
     override val gameDataStore = GameDatastore(db)
     override val chatStore = ChatStore(db)
 
-
     override val checklistController = ChecklistController(checklistDataStore, userDataStore)
     override val adminController = AdminController(userDataStore)
     override val usersController = UsersController(userDataStore)

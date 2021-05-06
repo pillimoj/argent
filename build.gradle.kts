@@ -22,10 +22,7 @@ sourceSets {
     test { resources.srcDir("testresources") }
 }
 
-val githubToken: String by project
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral {} }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -49,6 +46,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("net.logstash.logback:logstash-logback-encoder:6.3")
 
+    // Database
     implementation("com.google.cloud:google-cloud-firestore:2.3.0")
 
     // Google
