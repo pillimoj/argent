@@ -12,10 +12,14 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
+import io.ktor.websocket.DefaultWebSocketServerSession
 
 typealias CallContext = PipelineContext<Unit, ApplicationCall>
 typealias RouteHandler = suspend CallContext.(Unit) -> Unit
 typealias PrincipalHandler = suspend CallContext.(User) -> Unit
+typealias WsHandler = suspend DefaultWebSocketServerSession.() -> Unit
+typealias PrincipalWsHandler = suspend DefaultWebSocketServerSession.(User) -> Unit
+
 
 fun unAuthedHandler(method: HttpMethod, block: RouteHandler): RouteHandler = {
     requireMethod(method)
@@ -25,6 +29,11 @@ fun unAuthedHandler(method: HttpMethod, block: RouteHandler): RouteHandler = {
 fun authedHandler(method: HttpMethod, block: PrincipalHandler): RouteHandler = {
     requireMethod(method)
     val principal = call.principal<User>() ?: throw InternalServerError("No principal in api handler")
+    block(principal)
+}
+
+fun authedWsHandler(block: PrincipalWsHandler): WsHandler = {
+    val principal = call.principal<User>() ?: throw InternalServerError("No principal in api WS handler")
     block(principal)
 }
 

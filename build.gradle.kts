@@ -37,6 +37,7 @@ dependencies {
     implementation("io.ktor:ktor-auth:$ktorVersion")
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-websockets:$ktorVersion")
 
     // Json
     implementation("com.fasterxml.jackson.core:jackson-core:2.9.7")

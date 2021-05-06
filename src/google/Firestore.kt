@@ -14,4 +14,5 @@ class ArgentStore {
     val userAccess = db.collection("argent-usersAccess")
     val checklists = db.collection("argent-checklists")
     val checklistItems = db.collection("argent-checklistItems")
+    val chat = db.collection("chat")
 }

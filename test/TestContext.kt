@@ -1,7 +1,9 @@
 import argent.api.controllers.AdminController
+import argent.api.controllers.ChatController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
 import argent.api.controllers.UsersController
+import argent.data.chat.ChatStore
 import argent.data.checklists.ChecklistDataStore
 import argent.data.game.GameDatastore
 import argent.data.users.User
@@ -18,15 +20,24 @@ interface ApplicationContext {
     val checklistDataStore: ChecklistDataStore
     val userDataStore: UserDataStore
     val gameDataStore: GameDatastore
+    val chatStore: ChatStore
 
     val checklistController: ChecklistController
     val adminController: AdminController
     val usersController: UsersController
     val gameController: GameController
+    val chatController: ChatController
     val configureAuth: Authentication.Configuration.() -> Unit
     fun <T> testMain(callback: TestApplicationEngine.() -> T): T {
         return withTestApplication({
-            mainWithOverrides(checklistController, usersController, adminController, gameController, configureAuth)
+            mainWithOverrides(
+                checklistController,
+                usersController,
+                adminController,
+                gameController,
+                chatController,
+                configureAuth
+            )
         }) { callback() }
     }
 }
@@ -37,11 +48,14 @@ fun defaultApplicationContext(authenticatedUser: User) = object : ApplicationCon
     override val checklistDataStore = ChecklistDataStore(db)
     override val userDataStore = UserDataStore(db)
     override val gameDataStore = GameDatastore(db)
+    override val chatStore = ChatStore(db)
+
 
     override val checklistController = ChecklistController(checklistDataStore, userDataStore)
     override val adminController = AdminController(userDataStore)
     override val usersController = UsersController(userDataStore)
     override val gameController = GameController(gameDataStore)
+    override val chatController = ChatController(chatStore)
     override val configureAuth: Authentication.Configuration.() -> Unit = {
         testAuth { user = authenticatedUser }
     }
@@ -57,11 +71,17 @@ fun defaultApplicationContext(authenticatedUser: User) = object : ApplicationCon
 
 interface ApplicationTest {
     val authenticatedUser: User
-    fun <T : Any> withAppContext(context: ApplicationContext = defaultApplicationContext(authenticatedUser), block: suspend ApplicationContext.() -> T): T {
+    fun <T : Any> withAppContext(
+        context: ApplicationContext = defaultApplicationContext(authenticatedUser),
+        block: suspend ApplicationContext.() -> T
+    ): T {
         return runBlocking { context.run { block() } }
     }
 
-    fun <T> testApp(context: ApplicationContext = defaultApplicationContext(authenticatedUser), block: suspend ApplicationContext.() -> T) {
+    fun <T> testApp(
+        context: ApplicationContext = defaultApplicationContext(authenticatedUser),
+        block: suspend ApplicationContext.() -> T
+    ) {
         runBlocking { context.run { block() } }
     }
 }
