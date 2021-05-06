@@ -1,8 +1,6 @@
 package argent
 
-import argent.data.runMigrations
 import argent.server.Config
-import argent.server.DataBases
 import argent.server.main
 import io.ktor.application.Application
 import io.ktor.server.engine.embeddedServer
@@ -13,7 +11,6 @@ import org.slf4j.LoggerFactory
 fun main() {
     Config // Initialize
     val logger: Logger = LoggerFactory.getLogger("argent")
-    runMigrations(DataBases.Argent.dbPool)
 
     val server =
         embeddedServer(

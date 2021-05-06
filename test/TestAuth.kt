@@ -2,7 +2,7 @@
 import argent.data.users.User
 import argent.data.users.UserDataStore
 import argent.data.users.UserRole
-import argent.server.DataBases
+import argent.google.ArgentStore
 import io.ktor.auth.Authentication
 import io.ktor.auth.AuthenticationPipeline
 import io.ktor.auth.AuthenticationProvider
@@ -14,7 +14,7 @@ class TestAuthProvider internal constructor(
 ) : AuthenticationProvider(configuration) {
     // internal val confValue: String = configuration.confValue
     init {
-        val usersStore = UserDataStore(DataBases.Argent.dbPool)
+        val usersStore = UserDataStore(ArgentStore())
         runBlocking {
             if (usersStore.getUserForEmail(configuration.user.email) == null) {
                 usersStore.addUser(configuration.user)
@@ -42,7 +42,7 @@ fun Authentication.Configuration.testAuth(
 }
 
 val TestAuthDefaultUser = User(
-    id = UUID.fromString("61585D32-69EF-4F4F-9A9B-B37EFCECE870"),
+    user = UUID.fromString("61585D32-69EF-4F4F-9A9B-B37EFCECE870"),
     name = "TestUserName",
     email = "test@argent.grimsborn.com",
     role = UserRole.User,

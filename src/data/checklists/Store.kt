@@ -1,233 +1,110 @@
 package argent.data.checklists
 
 import argent.data.users.User
-import argent.util.asEnum
-import argent.util.toLocalDateTime
-import com.grimsborn.database.DatabaseQueries
-import com.grimsborn.database.asyncConnection
+import argent.data.users.UserAccess
+import argent.google.ArgentStore
+import argent.google.await
+import argent.google.parseList
+import argent.google.parseOne
+import argent.google.storable
+import com.google.api.core.ApiFutures
 import java.util.UUID
-import javax.sql.DataSource
 
-class ChecklistDataStore(private val db: DataSource) : DatabaseQueries {
+class ChecklistDataStore(private val db: ArgentStore) {
 
     suspend fun getChecklistsForUser(user: User): List<Checklist> {
-        return db.asyncConnection {
-            executeQuery(
-                """
-                SELECT id, name
-                FROM checklists c
-                LEFT JOIN checklist_access ca
-                ON c.id = ca.checklist
-                WHERE ca.argent_user = ?
-                """.trimIndent(),
-                listOf(user.id),
-                parseList { Checklist(it) }
-            )
-        }
+        val accessibleChecklistsIds = db.userAccess.whereEqualTo("user", user.user.toString())
+            .get()
+            .await()
+            .parseList<UserAccess>()
+            .map { it.checklist.toString() }
+        return db.checklists.whereIn("checklist", accessibleChecklistsIds)
+            .get()
+            .await()
+            .parseList()
     }
 
     suspend fun getChecklist(checklistId: UUID): Checklist? {
-        return db.asyncConnection {
-            executeQuery(
-                """
-                SELECT id, name
-                FROM checklists
-                WHERE id = ?
-                """.trimIndent(),
-                listOf(checklistId),
-                parse { Checklist(it) }
-            )
-        }
+        return db.checklists
+            .document(checklistId.toString())
+            .get()
+            .await()
+            .parseOne()
     }
 
     suspend fun getChecklistItems(checklistId: UUID): List<ChecklistItem> {
-        return db.asyncConnection {
-            executeQuery(
-                """
-                SELECT id, title, done, created_at, checklist
-                FROM checklistitems
-                WHERE checklist = ?
-                ORDER BY created_at
-                """.trimIndent(),
-                listOf(checklistId),
-                parseList { ChecklistItem(it) }
-            )
-        }
+        return db.checklistItems(checklistId)
+            .get()
+            .await()
+            .parseList()
     }
 
     suspend fun addChecklist(checklist: Checklist, user: User) {
-        db.asyncConnection {
-            transaction {
-                executeUpdate(
-                    """
-               INSERT INTO checklists (
-                    id,
-                    name
-               )
-               VALUES(?,?)
-                    """.trimIndent(),
-                    listOf(checklist.id, checklist.name)
-                )
-                executeUpdate(
-                    """
-                INSERT INTO checklist_access (
-                    checklist,
-                    argent_user,
-                    access_type
-                )
-                VALUES(?,?,?)
-                    """.trimIndent(),
-                    listOf(
-                        checklist.id,
-                        user.id,
-                        ChecklistAccessType.Owner
-                    )
-                )
-            }
-        }
+        val checklistFuture = db.checklists.document(checklist.checklist.toString()).set(checklist.storable())
+        val accessFuture = db.userAccess.add(UserAccess(checklist.checklist,
+            user.user,
+            user.name,
+            ChecklistAccessType.Owner).storable())
+        checklistFuture.await()
+        accessFuture.await()
     }
 
-    suspend fun getItem(itemId: UUID): ChecklistItem? {
-        return db.asyncConnection {
-            executeQuery(
-                """
-                SELECT
-                    id,
-                    title,
-                    done,
-                    created_at,
-                    checklist
-                FROM checklistitems
-                WHERE id = ?
-                """.trimIndent(),
-                listOf(itemId),
-                parse { ChecklistItem(it) }
-            )
-        }
+    suspend fun addChecklistNoAccess(checklist: Checklist) {
+        val checklistFuture = db.checklists.document(checklist.checklist.toString()).set(checklist.storable())
+        checklistFuture.await()
     }
 
-    suspend fun addItem(checklistItem: ChecklistItem) {
-        return db.asyncConnection {
-            executeUpdate(
-                """
-                INSERT INTO checklistitems (
-                    id,
-                    title,
-                    done,
-                    checklist,
-                    created_at
-                )
-                VALUES (?,?,?,?,?)
-                """.trimIndent(),
-                listOf(
-                    checklistItem.id,
-                    checklistItem.title,
-                    checklistItem.done,
-                    checklistItem.checklist,
-                    checklistItem.createdAt.toLocalDateTime(),
-                )
-            )
-        }
+    suspend fun getItem(checklistId: UUID, itemId: UUID): ChecklistItem? {
+        return db.checklistItems(checklistId).document(itemId.toString()).get().await().parseOne()
     }
 
-    suspend fun setItemDone(checklistItemId: UUID, isDone: Boolean) {
-        db.asyncConnection {
-            executeUpdate(
-                """
-                UPDATE checklistitems
-                SET done = ?
-                WHERE id = ?
-                """.trimIndent(),
-                listOf(isDone, checklistItemId)
-            )
-        }
+    suspend fun addItem(checklistId: UUID, checklistItem: ChecklistItem) {
+        db.checklistItems(checklistId).document(checklistItem.checklistItem.toString()).set(checklistItem.storable())
+            .await()
     }
 
-    suspend fun deleteChecklist(checklistId: UUID) {
-        db.asyncConnection {
-            transaction {
-                executeUpdate(
-                    """
-                    DELETE FROM checklistitems
-                    WHERE checklist = ?
-                    """.trimIndent(),
-                    listOf(checklistId)
-                )
-                executeUpdate(
-                    """
-                    DELETE FROM checklists
-                    WHERE id = ?
-                    """.trimIndent(),
-                    listOf(checklistId)
-                )
-            }
-        }
+    suspend fun setItemDone(checklistId: UUID, checklistItemId: UUID, isDone: Boolean) {
+        db.checklistItems(checklistId).document(checklistItemId.toString()).update(mapOf("done" to isDone)).await()
+    }
+
+    @Suppress("RedundantSuspendModifier")
+    suspend fun deleteChecklist(@Suppress("UNUSED_PARAMETER") checklistId: UUID) {
+        TODO("Not implemented")
     }
 
     suspend fun clearDone(checklistId: UUID) {
-        db.asyncConnection {
-            executeUpdate(
-                """
-                DELETE FROM checklistitems
-                WHERE checklist = ?
-                AND done
-                """.trimIndent(),
-                listOf(checklistId)
-            )
-        }
+        val deleteFutures = db.checklistItems(checklistId)
+            .whereEqualTo("done", true)
+            .select("checklistItem")
+            .get()
+            .await()
+            .map { it.reference.delete() }
+        ApiFutures.allAsList(deleteFutures).await()
     }
 
     suspend fun getAccessType(checklistId: UUID, user: User): ChecklistAccessType? {
-        return db.asyncConnection {
-            executeQuery(
-                """
-                SELECT access_type
-                FROM checklist_access
-                WHERE checklist = ?
-                AND argent_user = ?
-                """.trimIndent(),
-                listOf(
-                    checklistId,
-                    user.id,
-                ),
-                parse { it.getString("access_type").asEnum<ChecklistAccessType>() },
-            )
-        }
+        return db.userAccess
+            .whereEqualTo("user", user.user.toString())
+            .whereEqualTo("checklist", checklistId.toString())
+            .get()
+            .await()
+            .parseOne<UserAccess>()
+            ?.checklistAccessType
     }
 
-    suspend fun addUserAccess(checklistId: UUID, userId: UUID, accessType: ChecklistAccessType) {
-        db.asyncConnection {
-            executeUpdate(
-                """
-                INSERT INTO checklist_access (
-                    checklist,
-                    argent_user,
-                    access_type
-                )
-                VALUES (?,?,?)
-                """.trimIndent(),
-                listOf(
-                    checklistId,
-                    userId,
-                    accessType,
-                )
-            )
-        }
+    suspend fun addUserAccess(userAccess: UserAccess) {
+        db.userAccess.add(userAccess.storable()).await()
     }
 
     suspend fun removeUserAccess(checklistId: UUID, userId: UUID) {
-        db.asyncConnection {
-            executeUpdate(
-                """
-                DELETE FROM checklist_access
-                WHERE checklist = ?
-                AND argent_user = ?
-                """.trimIndent(),
-                listOf(
-                    checklistId,
-                    userId,
-                )
-            )
-        }
+        db.userAccess
+            .whereEqualTo("userId", userId.toString())
+            .whereEqualTo("checklist", checklistId.toString())
+            .get()
+            .await()
+            .firstOrNull()
+            ?.reference
+            ?.delete()
+            ?.await()
     }
 }

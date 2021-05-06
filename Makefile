@@ -18,7 +18,7 @@ rundocker:
 	docker run -t \
 	--env-file .env \
 	-v ${PWD}/localdockersecrets:/localsecrets \
-	--network argent_network -p 8008:8008 \
+	-p 8008:8008 \
 	${IMAGE_DIGEST}  | node logparse.js
 
 deploy: buildproductionimage

@@ -5,8 +5,8 @@ import argent.api.controllers.ChatController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
 import argent.api.controllers.UsersController
-import argent.api.controllers.WishListController
 import io.ktor.auth.authenticate
+import io.ktor.http.HttpMethod
 import io.ktor.routing.Route
 import io.ktor.routing.delete
 import io.ktor.routing.get
@@ -16,20 +16,26 @@ import io.ktor.websocket.webSocket
 
 fun Route.v1Routes(
     checklistController: ChecklistController,
-    wishListController: WishListController,
     usersController: UsersController,
     adminController: AdminController,
     gameController: GameController,
     chatController: ChatController,
 ) {
     authenticate {
-        get("me", checklistController.me)
+        get("me", usersController.me)
         route("checklists") {
             post(checklistController.checklists.create)
             get(checklistController.checklists.getAll)
             route("{id}") {
                 get(checklistController.checklists.getById)
-                get("items", checklistController.checklists.getItems)
+                route("items") {
+                    get(checklistController.checklists.getItems)
+                    post(checklistController.checklistItems.create)
+                    route("{item-id}") {
+                        post("done", checklistController.checklistItems.setDone)
+                        post("not-done", checklistController.checklistItems.setNotDone)
+                    }
+                }
                 delete(checklistController.checklists.delete)
                 post("clear-done", checklistController.checklists.clearDone)
                 post("share", checklistController.checklists.share)
@@ -37,28 +43,15 @@ fun Route.v1Routes(
                 get("users", checklistController.checklists.getUsers)
             }
         }
-        route("checklistitems") {
-            post(checklistController.checklistItems.create)
-            route("{id}") {
-                post("done", checklistController.checklistItems.setDone)
-                post("not-done", checklistController.checklistItems.setNotDone)
-            }
+        route("wishlist-items/{...}") {
+            get(notImplementedAuthedHandler(HttpMethod.Get))
+            post(notImplementedAuthedHandler(HttpMethod.Get))
+            delete(notImplementedAuthedHandler(HttpMethod.Get))
         }
-        route("wishlist-items") {
-            post(wishListController.addWishListItem)
-            route("{id}") {
-                delete(wishListController.deleteWishListItem)
-                post(wishListController.editWishlistItem)
-                post("take", wishListController.takeItem)
-                post("release", wishListController.releaseItem)
-            }
-        }
-        route("wishlists") {
-            get(wishListController.getAvailableWishlistsUsers)
-            get("me", wishListController.getOwnItems)
-            get("shared-with", wishListController.getUsersWithAccess)
-            post("share", wishListController.shareWithUser)
-            get("{id}", wishListController.getItemsForUser)
+        route("wishlists/{...}") {
+            get(notImplementedAuthedHandler(HttpMethod.Get))
+            post(notImplementedAuthedHandler(HttpMethod.Get))
+            delete(notImplementedAuthedHandler(HttpMethod.Get))
         }
         route("users") {
             get(usersController.getAll)
@@ -73,8 +66,8 @@ fun Route.v1Routes(
             get("status", gameController.getStatus)
             post("set-highest-cleared", gameController.setHighestCleared)
         }
-        route("chat"){
-            webSocket(protocol=null, chatController.chatHandler)
+        route("chat") {
+            webSocket(protocol = null, chatController.chatHandler)
         }
     } // end authenticate
     get("login", usersController.login)

@@ -13,8 +13,6 @@ import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import java.util.Collections
 
-
-
 class ChatController(chatStore: ChatStore) {
 
     private class Connection(val session: DefaultWebSocketSession, val name: String)

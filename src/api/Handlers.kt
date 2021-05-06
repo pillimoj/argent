@@ -9,6 +9,8 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.auth.principal
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
 import io.ktor.websocket.DefaultWebSocketServerSession
 
@@ -17,7 +19,6 @@ typealias RouteHandler = suspend CallContext.(Unit) -> Unit
 typealias PrincipalHandler = suspend CallContext.(User) -> Unit
 typealias WsHandler = suspend DefaultWebSocketServerSession.() -> Unit
 typealias PrincipalWsHandler = suspend DefaultWebSocketServerSession.(User) -> Unit
-
 
 fun unAuthedHandler(method: HttpMethod, block: RouteHandler): RouteHandler = {
     requireMethod(method)
@@ -42,4 +43,10 @@ fun adminHandler(method: HttpMethod, block: PrincipalHandler): RouteHandler = {
         throw ForbiddenException()
     }
     block(principal)
+}
+
+fun notImplementedAuthedHandler(method: HttpMethod): RouteHandler = {
+    requireMethod(method)
+    call.principal<User>() ?: throw InternalServerError("No principal in api handler")
+    call.respond(HttpStatusCode.NotImplemented)
 }

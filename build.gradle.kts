@@ -22,19 +22,7 @@ sourceSets {
     test { resources.srcDir("testresources") }
 }
 
-val githubUser: String by project
-val githubToken: String by project
-repositories {
-    mavenCentral {
-        content { excludeGroup("com.grimsborn") }
-    }
-    maven {
-        name = "GitHubPackages"
-        githubAuth()
-        url = uri("https://maven.pkg.github.com/pillimoj/grimsborn-database")
-        // content { includeModule("com.grimsborn", "database") }
-    }
-}
+repositories { mavenCentral {} }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -42,24 +30,24 @@ dependencies {
     // Ktor
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-jetty:$ktorVersion")
-    implementation("io.ktor:ktor-serialization:$ktorVersion")
+    implementation("io.ktor:ktor-jackson:$ktorVersion")
     implementation("io.ktor:ktor-auth:$ktorVersion")
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-websockets:$ktorVersion")
 
     // Json
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.9.7")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.9.7")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("net.logstash.logback:logstash-logback-encoder:6.3")
 
     // Database
-    implementation("com.grimsborn:database:[1.1.1, 2.0)")
-    implementation("com.zaxxer:HikariCP:3.4.5")
-    implementation("org.postgresql:postgresql:42.2.18")
-    implementation("org.flywaydb:flyway-core:6.2.4")
+    implementation("com.google.cloud:google-cloud-firestore:2.3.0")
 
     // Google
     implementation("com.google.cloud:google-cloud-secretmanager:1.4.0")
@@ -131,11 +119,4 @@ fun getEnvVariables(): Map<String, String> {
         ?.map { it.split("=").zipWithNext().first() }
         ?.filter { System.getenv(it.first).isNullOrBlank() }
         ?.toMap() ?: emptyMap()
-}
-
-fun org.gradle.api.artifacts.repositories.MavenArtifactRepository.githubAuth() {
-    credentials {
-        username = System.getenv("GTIHUB_ACTOR") ?: githubUser
-        password = System.getenv("GITHUB_TOKEN") ?: githubToken
-    }
 }

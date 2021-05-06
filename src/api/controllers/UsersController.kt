@@ -17,6 +17,10 @@ import io.ktor.http.HttpMethod
 import io.ktor.response.respond
 
 class UsersController(private val userDataStore: UserDataStore) {
+    val me = authedHandler(HttpMethod.Get) { user ->
+        call.respond(user)
+    }
+
     val getAll = authedHandler(HttpMethod.Get) {
         val users = userDataStore.getAllUsers().map { UserForSharing(it) }
         call.respond(users)

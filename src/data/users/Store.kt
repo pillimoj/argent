@@ -1,96 +1,39 @@
 package argent.data.users
 
-import com.grimsborn.database.DatabaseQueries
-import com.grimsborn.database.asyncConnection
+import argent.google.ArgentStore
+import argent.google.await
+import argent.google.parseList
+import argent.google.parseOne
+import argent.google.storable
+import com.google.api.core.ApiFutures
 import java.util.UUID
-import javax.sql.DataSource
 
-class UserDataStore(private val db: DataSource) : DatabaseQueries {
+class UserDataStore(private val db: ArgentStore) {
     suspend fun getUserForEmail(email: String): User? {
-        return db.asyncConnection {
-            executeQuery(
-                """
-                SELECT
-                    id,
-                    name,
-                    email,
-                    role
-                FROM argent_users
-                WHERE email = ?
-                """.trimIndent(),
-                listOf(email),
-                parse { User(it) }
-            )
-        }
+        return db.users.whereEqualTo("email", email).get().await().parseOne()
+    }
+
+    suspend fun getUser(userId: UUID): User? {
+        return db.users.document(userId.toString()).get().await().parseOne()
     }
 
     suspend fun getUsersForChecklist(checklistId: UUID): List<UserAccess> {
-        return db.asyncConnection {
-            executeQuery(
-                """
-                SELECT
-                    id,
-                    name,
-                    access_type
-                FROM argent_users u
-                LEFT JOIN checklist_access ca
-                ON ca.argent_user = u.id
-                WHERE ca.checklist = ?
-                """.trimIndent(),
-                listOf(checklistId),
-                parseList { UserAccess(it) }
-            )
-        }
+        val userAccesses = db.userAccess.whereEqualTo("checklist", checklistId).select("user").get().await().parseList<String>().toSet()
+        return db.users.whereIn("user", userAccesses.toMutableList()).get().await().parseList()
     }
 
     suspend fun getAllUsers(): List<User> {
-        return db.asyncConnection {
-            executeQuery(
-                """
-                SELECT
-                    id,
-                    name,
-                    email,
-                    role
-                FROM argent_users u
-                """.trimIndent(),
-                emptyList(),
-                parseList { User(it) }
-            )
-        }
+        return db.users.get().await().parseList()
     }
 
     suspend fun addUser(user: User) {
-        db.asyncConnection {
-            executeUpdate(
-                """
-                INSERT INTO argent_users (
-                    id,
-                    name,
-                    email,
-                    role
-                )
-                VALUES(?,?,?,?)
-                """.trimIndent(),
-                listOf(
-                    user.id,
-                    user.name,
-                    user.email,
-                    user.role
-                )
-            )
-        }
+        db.users.document(user.user.toString()).set(user.storable()).await()
     }
 
     suspend fun deleteUser(userId: UUID) {
-        db.asyncConnection {
-            executeUpdate(
-                """
-                DELETE FROM argent_users
-                WHERE id = ?
-                """.trimIndent(),
-                listOf(userId)
-            )
-        }
+        val userAccessDocRefs = db.userAccess.whereEqualTo("user", userId.toString()).select("user").get().await().map { it.reference }
+        val deleteAccessFutures = userAccessDocRefs.map { it.delete() }
+        ApiFutures.allAsList(deleteAccessFutures).await()
+        db.users.document(userId.toString()).delete().await()
     }
 }
