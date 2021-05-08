@@ -6,7 +6,7 @@ plugins {
     application
 }
 
-val ktorVersion = "1.5.0"
+val ktorVersion = "1.5.3"
 val argentMainClass = "argent.MainKt"
 val image = "argent"
 

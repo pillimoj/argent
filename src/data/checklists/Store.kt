@@ -18,6 +18,11 @@ class ChecklistDataStore(private val db: ArgentStore) {
             .await()
             .parseList<UserAccess>()
             .map { it.checklist.toString() }
+
+        if (accessibleChecklistsIds.isEmpty()) {
+            return emptyList()
+        }
+
         return db.checklists.whereIn("checklist", accessibleChecklistsIds)
             .get()
             .await()
@@ -41,10 +46,14 @@ class ChecklistDataStore(private val db: ArgentStore) {
 
     suspend fun addChecklist(checklist: Checklist, user: User) {
         val checklistFuture = db.checklists.document(checklist.checklist.toString()).set(checklist.storable())
-        val accessFuture = db.userAccess.add(UserAccess(checklist.checklist,
-            user.user,
-            user.name,
-            ChecklistAccessType.Owner).storable())
+        val accessFuture = db.userAccess.add(
+            UserAccess(
+                checklist.checklist,
+                user.user,
+                user.name,
+                ChecklistAccessType.Owner
+            ).storable()
+        )
         checklistFuture.await()
         accessFuture.await()
     }

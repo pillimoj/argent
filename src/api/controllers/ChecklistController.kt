@@ -15,6 +15,7 @@ import argent.data.users.UserDataStore
 import argent.data.users.UserRole
 import argent.server.BadRequestException
 import argent.server.ForbiddenException
+import argent.server.NotFoundException
 import argent.util.pathIdParam
 import io.ktor.application.call
 import io.ktor.http.HttpMethod
@@ -62,7 +63,7 @@ class ChecklistController(
             if (!hasAccess(id, user)) {
                 throw ForbiddenException()
             }
-            val checklist = checklistDataStore.getChecklist(id)!!
+            val checklist = checklistDataStore.getChecklist(id) ?: throw NotFoundException("No such checklist: $id")
             call.respond(checklist)
         }
 

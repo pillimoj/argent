@@ -13,16 +13,17 @@ import argent.data.game.GameDatastore
 import argent.data.users.UserDataStore
 import argent.google.ArgentStore
 import argent.server.features.argentAuthJwt
-import argent.server.features.installCORS
+import argent.server.features.configure
 import argent.server.features.installCallLogging
-import argent.server.features.installErrorHandling
 import argent.util.defaultJackson
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.auth.Authentication
+import io.ktor.features.CORS
 import io.ktor.features.Compression
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.HSTS
+import io.ktor.features.StatusPages
 import io.ktor.features.XForwardedHeaderSupport
 import io.ktor.features.gzip
 import io.ktor.http.cio.websocket.pingPeriod
@@ -72,11 +73,9 @@ fun Application.mainWithOverrides(
     install(Compression) { gzip() }
     install(XForwardedHeaderSupport)
     install(HSTS)
-    installCORS()
-    installErrorHandling()
-    install(Authentication) {
-        configureAuth()
-    }
+    install(CORS) { configure() }
+    install(StatusPages) { configure() }
+    install(Authentication) { configureAuth() }
     install(WebSockets) {
         pingPeriod = Duration.ofSeconds(15)
         timeout = Duration.ofSeconds(15)

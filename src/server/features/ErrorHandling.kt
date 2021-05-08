@@ -4,9 +4,7 @@ import argent.api.ErrorMessage
 import argent.server.ApiException
 import argent.server.InternalServerError
 import argent.util.logger
-import io.ktor.application.Application
 import io.ktor.application.call
-import io.ktor.application.install
 import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.path
@@ -20,26 +18,23 @@ private fun Logger.apiException(e: ApiException) = when (e) {
     else -> info(e.logMessage, e)
 }
 
-fun Application.installErrorHandling() {
-    install(StatusPages) {
+fun StatusPages.Configuration.configure() {
+    exception<ApiException> { cause ->
+        logger.apiException(cause)
+        call.respond(HttpStatusCode.fromValue(cause.statusCode), cause.errorMessage())
+    }
 
-        exception<ApiException> { cause ->
-            logger.apiException(cause)
-            call.respond(HttpStatusCode.fromValue(cause.statusCode), cause.errorMessage())
-        }
+    exception<Exception> {
+        logger.error("Ktor caught exception", it)
+        val ex = it
+        call.respond(HttpStatusCode.InternalServerError, ErrorMessage("Internal Server Error"))
+    }
 
-        exception<Exception> {
-            logger.error("Ktor caught exception", it)
-            val ex = it
-            call.respond(HttpStatusCode.InternalServerError, ErrorMessage("Internal Server Error"))
-        }
-
-        status(HttpStatusCode.NotFound) {
-            val path = call.request.path()
-            call.respond(
-                HttpStatusCode.NotFound,
-                ErrorMessage("Not found: $path")
-            )
-        }
+    status(HttpStatusCode.NotFound) {
+        val path = call.request.path()
+        call.respond(
+            HttpStatusCode.NotFound,
+            ErrorMessage("Not found: $path")
+        )
     }
 }

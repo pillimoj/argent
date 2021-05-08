@@ -19,6 +19,7 @@ class UserDataStore(private val db: ArgentStore) {
 
     suspend fun getUsersForChecklist(checklistId: UUID): List<UserAccess> {
         val userAccesses = db.userAccess.whereEqualTo("checklist", checklistId).select("user").get().await().parseList<String>().toSet()
+        if (userAccesses.isEmpty()) return emptyList()
         return db.users.whereIn("user", userAccesses.toMutableList()).get().await().parseList()
     }
 

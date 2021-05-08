@@ -10,3 +10,6 @@ out
 # Gradle
 .gradle
 /build
+
+# Service account
+/localsecrets/sa.json
