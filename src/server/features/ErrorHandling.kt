@@ -3,7 +3,7 @@ package argent.server.features
 import argent.api.ErrorMessage
 import argent.server.ApiException
 import argent.server.InternalServerError
-import argent.util.logger
+import argent.util.namedLogger
 import io.ktor.application.call
 import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
@@ -20,13 +20,12 @@ private fun Logger.apiException(e: ApiException) = when (e) {
 
 fun StatusPages.Configuration.configure() {
     exception<ApiException> { cause ->
-        logger.apiException(cause)
+        namedLogger("argent.server.features.ErrorHandling").apiException(cause)
         call.respond(HttpStatusCode.fromValue(cause.statusCode), cause.errorMessage())
     }
 
     exception<Exception> {
-        logger.error("Ktor caught exception", it)
-        val ex = it
+        namedLogger("argent.server.features.ErrorHandling").error("Ktor caught exception", it)
         call.respond(HttpStatusCode.InternalServerError, ErrorMessage("Internal Server Error"))
     }
 

@@ -4,7 +4,8 @@ import argent.jwt.ArgentJwt
 import argent.server.ApiException
 import argent.server.Config
 import argent.server.UnauthorizedException
-import argent.util.logger
+import argent.util.extra
+import argent.util.namedLogger
 import com.auth0.jwt.exceptions.JWTVerificationException
 import io.ktor.application.call
 import io.ktor.auth.Authentication
@@ -56,6 +57,7 @@ fun Authentication.Configuration.argentAuthJwt(
         try {
             val argentToken = call.request.cookies[Config.authentication.cookieName] ?: throw UnauthorizedException()
             val validationResult = ArgentJwt.validateToken(argentToken)
+            namedLogger("argent.server.features.ArgentAuth").info("Request Authenticated", extra("user" to validationResult.user.user.toString()))
             context.principal(validationResult.user)
             return@intercept
         } catch (e: Exception) {
@@ -63,10 +65,10 @@ fun Authentication.Configuration.argentAuthJwt(
                 throw e
             }
             if (e is JWTVerificationException) {
-                logger.info("Could not verify argent token", e)
+                namedLogger("argent.server.features.ArgentAuth").info("Could not verify argent token", e)
                 throw UnauthorizedException()
             }
-            logger.error("Token verification error", e)
+            namedLogger("argent.server.features.ArgentAuth").error("Token verification error", e)
             throw e
         }
     }

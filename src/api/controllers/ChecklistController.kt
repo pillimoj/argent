@@ -16,6 +16,9 @@ import argent.data.users.UserRole
 import argent.server.BadRequestException
 import argent.server.ForbiddenException
 import argent.server.NotFoundException
+import argent.util.WithLogger
+import argent.util.extra
+import argent.util.logger
 import argent.util.pathIdParam
 import io.ktor.application.call
 import io.ktor.http.HttpMethod
@@ -25,7 +28,7 @@ import java.util.UUID
 class ChecklistController(
     private val checklistDataStore: ChecklistDataStore,
     private val userDataStore: UserDataStore,
-) {
+) : WithLogger {
     suspend fun isOwner(checklistId: UUID, user: User): Boolean {
         return user.role == UserRole.Admin || checklistDataStore.getAccessType(
             checklistId,
@@ -40,12 +43,14 @@ class ChecklistController(
     inner class Checklists {
         val create = authedHandler(HttpMethod.Post) { user ->
             val checklist = Checklist.deserialize(call)
+            logger.info("Creating checklist", extra("checklist" to checklist))
             checklistDataStore.addChecklist(checklist, user)
             call.respond(checklist)
         }
 
         val delete = authedHandler(HttpMethod.Delete) { user ->
             val id = pathIdParam()
+            logger.info("deleting checklist", extra("checklistId" to id))
             if (!isOwner(id, user)) {
                 throw ForbiddenException()
             }
@@ -54,12 +59,14 @@ class ChecklistController(
         }
 
         val getAll = authedHandler(HttpMethod.Get) { user ->
+            logger.info("getting all checklists")
             val checklists = checklistDataStore.getChecklistsForUser(user)
             call.respond(checklists)
         }
 
         val getById = authedHandler(HttpMethod.Get) { user ->
             val id = pathIdParam()
+            logger.info("getting checklist", extra("checklistId" to id))
             if (!hasAccess(id, user)) {
                 throw ForbiddenException()
             }
@@ -69,6 +76,7 @@ class ChecklistController(
 
         val getItems = authedHandler(HttpMethod.Get) { user ->
             val id = pathIdParam()
+            logger.info("getting checklist items", extra("checklistId" to id))
             if (!hasAccess(id, user)) {
                 throw ForbiddenException()
             }
@@ -78,6 +86,7 @@ class ChecklistController(
 
         val clearDone = authedHandler(HttpMethod.Post) { user ->
             val id = pathIdParam()
+            logger.info("clearing done checklist items", extra("checklistId" to id))
             if (!hasAccess(id, user)) {
                 throw ForbiddenException()
             }
@@ -88,6 +97,7 @@ class ChecklistController(
         val share = authedHandler(HttpMethod.Post) { user ->
             val checklistId = pathIdParam()
             val shareRequest = ShareRequest.deserialize(call)
+            logger.info("sharing checklist", extra("checklistId" to checklistId, "shareRequest" to shareRequest))
             if (!isOwner(checklistId, user)) {
                 throw ForbiddenException()
             }
@@ -107,10 +117,11 @@ class ChecklistController(
         val unShare = authedHandler(HttpMethod.Post) { user ->
             val checklistId = pathIdParam()
             val userId = pathIdParam("userId")
+            logger.info("Un-sharing checklist", extra("userToUnshareWith" to userId))
             val checklistOwners = userDataStore.getUsersForChecklist(checklistId)
                 .filter { it.checklistAccessType == ChecklistAccessType.Owner }
             if (checklistOwners.size == 1 && checklistOwners.first().user == userId) {
-                throw BadRequestException("Cannot remove lst owner of a list")
+                throw BadRequestException("Cannot remove last owner of a list")
             }
             if (!isOwner(checklistId, user)) {
                 throw ForbiddenException()
@@ -121,6 +132,7 @@ class ChecklistController(
 
         val getUsers = authedHandler(HttpMethod.Get) { user ->
             val checklistId = pathIdParam()
+            logger.info("getting users for checklist", extra("checklistId" to checklistId))
             if (!hasAccess(checklistId, user)) {
                 throw ForbiddenException()
             }
@@ -133,6 +145,7 @@ class ChecklistController(
         val create = authedHandler(HttpMethod.Post) { user ->
             val checklistId = pathIdParam()
             val item = ChecklistItem.deserialize(call)
+            logger.info("adding item to checklist", extra("checklistId" to checklistId, "item" to item))
             if (!hasAccess(checklistId, user)) throw ForbiddenException()
             checklistDataStore.addItem(checklistId, item)
             call.respondOk()
@@ -148,6 +161,8 @@ class ChecklistController(
         private suspend fun setItemStatus(callContext: CallContext, user: User, done: Boolean) {
             val checklistId = callContext.pathIdParam()
             val itemId = callContext.pathIdParam("item-id")
+            logger.info("setting checklist item status",
+                extra("checklistId" to checklistId, "itemId" to itemId, "newStatus" to done))
             val item = checklistDataStore.getItem(checklistId, itemId)
             if (item == null || !hasAccess(checklistId, user)) {
                 throw BadRequestException()

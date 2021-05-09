@@ -70,9 +70,7 @@ tasks {
         }
     }
     val run by existing(JavaExec::class) {
-        val envVars = getEnvVariables()
-        this.systemProperties["io.ktor.development"] = envVars["ARGENT_DEBUG"] == "true"
-        envVars.forEach { environment(it.key, it.value) }
+        getEnvVariables().forEach { environment(it.key, it.value) }
         dependsOn(ktlintFormat)
     }
 
@@ -84,6 +82,7 @@ tasks {
 // PLUGINS
 application {
     mainClass.set(argentMainClass)
+    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=true")
 }
 
 jib {
