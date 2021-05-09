@@ -25,23 +25,6 @@ inline fun <reified T> getDevConf(name: String): T {
     return defaultObjectMapper.readValue(configJsonString)
 }
 
-data class DbConf(
-    val database: String,
-    val user: String,
-    val password: String,
-    val tcpConf: TCPDbConf? = null,
-    val cloudSqlDbConf: CloudSqlDbConf? = null
-)
-
-data class CloudSqlDbConf(
-    val connectionName: String
-)
-
-data class TCPDbConf(
-    val host: String,
-    val port: Int
-)
-
 data class AuthConf(
     val jwtKey: String,
     val secureCookie: Boolean,
@@ -54,11 +37,6 @@ object Config {
     private val debug = getConfig("ARGENT_DEBUG", "false") == "true"
 
     val googleProject = getConfig("GOOGLE_CLOUD_PROJECT")
-
-    val argentDb: DbConf by lazy {
-        if (debug) getDevConf("argent-db")
-        else getSecretConf("argent-db")
-    }
 
     val authentication: AuthConf by lazy {
         if (debug) getDevConf("argent-authentication")

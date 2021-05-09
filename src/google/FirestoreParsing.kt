@@ -1,7 +1,6 @@
 package argent.google
 
 import argent.util.defaultObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.google.cloud.firestore.DocumentSnapshot
 import com.google.cloud.firestore.QuerySnapshot
 
@@ -15,7 +14,7 @@ inline fun <reified T> QuerySnapshot.parseOne(): T? {
 }
 
 inline fun <reified T> Map<String, Any?>.parse(): T {
-    return defaultObjectMapper.readValue(defaultObjectMapper.writeValueAsString(this))
+    return defaultObjectMapper.convertValue(this, T::class.java)
 }
 
 inline fun <reified T> DocumentSnapshot.parseOne(): T? {

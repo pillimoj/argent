@@ -1,5 +1,4 @@
 plugins {
-    kotlin("plugin.serialization") version "1.4.21"
     kotlin("jvm") version "1.4.21"
     id("com.google.cloud.tools.jib") version "2.7.1"
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
@@ -49,9 +48,8 @@ dependencies {
     // Database
     implementation("com.google.cloud:google-cloud-firestore:2.3.0")
 
-    // Google
+    // Secrets
     implementation("com.google.cloud:google-cloud-secretmanager:1.4.0")
-    implementation("com.google.cloud.sql:postgres-socket-factory:1.2.0")
 
     // JWT
     implementation("com.auth0:java-jwt:3.12.0")
