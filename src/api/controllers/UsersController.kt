@@ -18,7 +18,7 @@ import io.ktor.application.call
 import io.ktor.http.HttpMethod
 import io.ktor.response.respond
 
-class UsersController(private val userDataStore: UserDataStore): WithLogger {
+class UsersController(private val userDataStore: UserDataStore) : WithLogger {
     val me = authedHandler(HttpMethod.Get) { user ->
         logger.info("getting own user")
         call.respond(user)

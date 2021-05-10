@@ -12,7 +12,7 @@ import io.ktor.application.call
 import io.ktor.http.HttpMethod
 import io.ktor.response.respond
 
-class GameController(private val gameDatastore: GameDatastore): WithLogger {
+class GameController(private val gameDatastore: GameDatastore) : WithLogger {
     val getStatus = authedHandler(HttpMethod.Get) { user ->
         logger.info("getting user game status")
         val gameStatus = gameDatastore.getStatusForUser(user)

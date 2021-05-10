@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit
 
 fun base64Decode(encoded: String): String = String(Base64.getDecoder().decode(encoded))
 
-object GoogleTokenVerification: WithLogger {
+object GoogleTokenVerification : WithLogger {
     private val provider: JwkProvider = JwkProviderBuilder(URL("https://www.googleapis.com/oauth2/v3/certs"))
         .cached(5, 5, TimeUnit.HOURS)
         .build()

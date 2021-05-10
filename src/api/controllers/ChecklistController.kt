@@ -161,8 +161,10 @@ class ChecklistController(
         private suspend fun setItemStatus(callContext: CallContext, user: User, done: Boolean) {
             val checklistId = callContext.pathIdParam()
             val itemId = callContext.pathIdParam("item-id")
-            logger.info("setting checklist item status",
-                extra("checklistId" to checklistId, "itemId" to itemId, "newStatus" to done))
+            logger.info(
+                "setting checklist item status",
+                extra("checklistId" to checklistId, "itemId" to itemId, "newStatus" to done)
+            )
             val item = checklistDataStore.getItem(checklistId, itemId)
             if (item == null || !hasAccess(checklistId, user)) {
                 throw BadRequestException()

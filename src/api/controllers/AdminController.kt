@@ -13,7 +13,7 @@ import io.ktor.application.call
 import io.ktor.http.HttpMethod
 import io.ktor.response.respond
 
-class AdminController(private val userDataStore: UserDataStore): WithLogger {
+class AdminController(private val userDataStore: UserDataStore) : WithLogger {
     val getAllUsers = adminHandler(HttpMethod.Get) {
         logger.info("Getting all users")
         val allUsers = userDataStore.getAllUsers()

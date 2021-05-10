@@ -15,7 +15,7 @@ import io.ktor.http.cio.websocket.readText
 import kotlinx.coroutines.launch
 import java.util.Collections
 
-class ChatController(chatStore: ChatStore): WithLogger {
+class ChatController(chatStore: ChatStore) : WithLogger {
 
     private class Connection(val session: DefaultWebSocketSession, val user: User)
     private val connections = Collections.synchronizedSet<Connection?>(LinkedHashSet())

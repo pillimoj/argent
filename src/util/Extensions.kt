@@ -16,10 +16,14 @@ fun String.toUUIDSafe(): UUID? = runCatching {
 fun PipelineContext<Unit, ApplicationCall>.pathIdParam(name: String = "id"): UUID {
     val paramValue = call.parameters[name]
     val uuidValue = paramValue?.toUUIDSafe()
-    if (paramValue == null) namedLogger("argent.util.Extensions").warn("Missing path parameter",
-        extra("paramName" to name))
-    else if (uuidValue == null) namedLogger("argent.util.Extensions").warn("Invalid UUID path parameter",
-        extra("paramName" to name, "paramValue" to paramValue))
+    if (paramValue == null) namedLogger("argent.util.Extensions").warn(
+        "Missing path parameter",
+        extra("paramName" to name)
+    )
+    else if (uuidValue == null) namedLogger("argent.util.Extensions").warn(
+        "Invalid UUID path parameter",
+        extra("paramName" to name, "paramValue" to paramValue)
+    )
     return uuidValue ?: throw NotFoundException("No such id")
 }
 
