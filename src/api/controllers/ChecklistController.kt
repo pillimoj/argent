@@ -80,7 +80,7 @@ class ChecklistController(
             if (!hasAccess(id, user)) {
                 throw ForbiddenException()
             }
-            val items = checklistDataStore.getChecklistItems(id)
+            val items = checklistDataStore.getChecklistItems(id).sortedBy { it.createdAt }
             call.respond(items)
         }
 
