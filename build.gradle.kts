@@ -1,11 +1,11 @@
 plugins {
-    kotlin("jvm") version "1.4.21"
-    id("com.google.cloud.tools.jib") version "2.7.1"
-    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
+    kotlin("jvm") version "1.6.0"
+    id("com.google.cloud.tools.jib") version "3.1.4"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     application
 }
 
-val ktorVersion = "1.5.3"
+val ktorVersion = "1.6.5"
 val argentMainClass = "argent.MainKt"
 val image = "argent"
 
@@ -24,7 +24,7 @@ sourceSets {
 repositories { mavenCentral {} }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
 
     // Ktor
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
@@ -36,23 +36,23 @@ dependencies {
     implementation("io.ktor:ktor-websockets:$ktorVersion")
 
     // Json
-    implementation("com.fasterxml.jackson.core:jackson-core:2.9.7")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.9.7")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.13.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("net.logstash.logback:logstash-logback-encoder:6.3")
 
     // Database
-    implementation("com.google.cloud:google-cloud-firestore:2.3.0")
+    implementation("com.google.cloud:google-cloud-firestore:3.0.7")
 
     // Secrets
-    implementation("com.google.cloud:google-cloud-secretmanager:1.4.0")
+    implementation("com.google.cloud:google-cloud-secretmanager:2.0.4")
 
     // JWT
-    implementation("com.auth0:java-jwt:3.12.0")
+    implementation("com.auth0:java-jwt:3.18.2")
 
     // Tests
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
