@@ -23,10 +23,13 @@ class ChecklistDataStore(private val db: ArgentStore) {
             return emptyList()
         }
 
-        return db.checklists.whereIn("checklist", accessibleChecklistsIds)
-            .get()
-            .await()
-            .parseList()
+        val listFutures = accessibleChecklistsIds.chunked(10).map {
+            db.checklists
+                .whereIn("checklist", it)
+                .get()
+        }
+        val allLists = ApiFutures.allAsList(listFutures).await().flatMap { it.parseList<Checklist>() }
+        return allLists.distinctBy { it.checklist }
     }
 
     suspend fun getChecklist(checklistId: UUID): Checklist? {
