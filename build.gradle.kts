@@ -44,6 +44,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.0")
     implementation("org.postgresql:postgresql:42.3.1")
     implementation("org.flywaydb:flyway-core:8.2.3")
+    implementation("com.google.cloud.sql:postgres-socket-factory:1.2.0")
 
     // Json
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
