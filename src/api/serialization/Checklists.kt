@@ -1,28 +1,37 @@
+@file:UseSerializers(GMTDateSerializer::class, UUIDSerializer::class)
 
 package argent.api.serialization
 
 import argent.data.checklists.Checklist
 import argent.data.checklists.ChecklistItem
+import argent.util.GMTDateSerializer
+import argent.util.UUIDSerializer
 import io.ktor.application.ApplicationCall
 import io.ktor.request.receive
-import java.time.Instant
+import io.ktor.util.date.GMTDate
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 import java.util.UUID
 
+@Serializable
 private class ChecklistReq(val id: UUID? = null, val name: String) {
-    val value: Checklist get() = Checklist(checklist = id ?: UUID.randomUUID(), name = name)
+    val value: Checklist get() = Checklist(id = id ?: UUID.randomUUID(), name = name)
 }
 
+@Serializable
 private class ChecklistItemReq(
     val id: UUID? = null,
     val title: String,
-    val createdAt: Instant? = null
+    val checklist: UUID,
+    val createdAt: GMTDate? = null
 ) {
     val value: ChecklistItem
         get() = ChecklistItem(
-            checklistItem = id ?: UUID.randomUUID(),
+            id = id ?: UUID.randomUUID(),
             title = title,
+            checklist = checklist,
             done = false,
-            createdAt = createdAt ?: Instant.now()
+            createdAt = createdAt ?: GMTDate()
         )
 }
 

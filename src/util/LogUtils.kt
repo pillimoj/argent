@@ -10,6 +10,7 @@ fun extra(vararg keyValues: Pair<String, Any?>): StructuredArgument? {
 }
 
 interface WithLogger
+@Suppress("unused")
 inline val <reified T : WithLogger> T.logger: Logger
     get() = LoggerFactory.getLogger(T::class.java)
 

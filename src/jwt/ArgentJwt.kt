@@ -3,11 +3,10 @@ package argent.jwt
 import argent.data.users.User
 import argent.server.Config
 import argent.server.UnauthorizedException
-import argent.util.defaultObjectMapper
+import argent.util.argentJson
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.fasterxml.jackson.module.kotlin.readValue
 import java.util.Date
 
 data class TokenValidationResult(val token: DecodedJWT, val user: User)
@@ -27,14 +26,14 @@ object ArgentJwt {
 
     fun createToken(user: User): String = JWT.create()
         .withIssuer(issuer)
-        .withClaim("argent_user", defaultObjectMapper.writeValueAsString(user))
+        .withClaim("argent_user", argentJson.encodeToString(User.serializer(), user))
         .withExpiresAt(dateInFutureMinutes(30))
         .sign(algorithm)
 
     fun validateToken(token: String): TokenValidationResult {
         val validToken = verifier.verify(token) ?: throw UnauthorizedException()
         val userClaim = validToken.getClaim("argent_user").asString()
-        val user = defaultObjectMapper.readValue<User>(userClaim)
+        val user = argentJson.decodeFromString(User.serializer(), userClaim)
         return TokenValidationResult(validToken, user)
     }
 }

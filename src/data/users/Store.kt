@@ -1,40 +1,114 @@
 package argent.data.users
 
-import argent.google.ArgentStore
-import argent.google.await
-import argent.google.parseList
-import argent.google.parseOne
-import argent.google.storable
-import com.google.api.core.ApiFutures
+import argent.util.database.DatabaseQueries
+import argent.util.database.asyncConnection
 import java.util.UUID
+import javax.sql.DataSource
 
-class UserDataStore(private val db: ArgentStore) {
+class UserDataStore(private val db: DataSource) : DatabaseQueries {
     suspend fun getUserForEmail(email: String): User? {
-        return db.users.whereEqualTo("email", email).get().await().parseOne()
+        return db.asyncConnection {
+            executeQuery(
+                """
+                SELECT
+                    id,
+                    name,
+                    email,
+                    role
+                FROM argent_users
+                WHERE email = ?
+                """.trimIndent(),
+                listOf(email),
+                parse { User(it) }
+            )
+        }
     }
 
     suspend fun getUser(userId: UUID): User? {
-        return db.users.document(userId.toString()).get().await().parseOne()
+        return db.asyncConnection {
+            executeQuery(
+                """
+                SELECT
+                    id,
+                    name,
+                    email,
+                    role
+                FROM argent_users
+                WHERE id = ?
+                """.trimIndent(),
+                listOf(userId),
+                parse { User(it) }
+            )
+        }
     }
 
     suspend fun getUsersForChecklist(checklistId: UUID): List<UserAccess> {
-        val userAccesses = db.userAccess.whereEqualTo("checklist", checklistId).select("user").get().await().parseList<String>().toSet()
-        if (userAccesses.isEmpty()) return emptyList()
-        return db.users.whereIn("user", userAccesses.toMutableList()).get().await().parseList()
+        return db.asyncConnection {
+            executeQuery(
+                """
+                SELECT
+                    id,
+                    name,
+                    access_type
+                FROM argent_users u
+                LEFT JOIN checklist_access ca
+                ON ca.argent_user = u.id
+                WHERE ca.checklist = ?
+                """.trimIndent(),
+                listOf(checklistId),
+                parseList { UserAccess(it) }
+            )
+        }
     }
 
     suspend fun getAllUsers(): List<User> {
-        return db.users.get().await().parseList()
+        return db.asyncConnection {
+            executeQuery(
+                """
+                SELECT
+                    id,
+                    name,
+                    email,
+                    role
+                FROM argent_users u
+                """.trimIndent(),
+                emptyList(),
+                parseList { User(it) }
+            )
+        }
     }
 
     suspend fun addUser(user: User) {
-        db.users.document(user.user.toString()).set(user.storable()).await()
+        db.asyncConnection {
+            executeUpdate(
+                """
+                INSERT INTO argent_users (
+                    id,
+                    name,
+                    email,
+                    role
+                )
+                VALUES(?,?,?,?)
+                """.trimIndent(),
+                listOf(
+                    user.id,
+                    user.name,
+                    user.email,
+                    user.role
+                )
+            )
+        }
     }
 
     suspend fun deleteUser(userId: UUID) {
-        val userAccessDocRefs = db.userAccess.whereEqualTo("user", userId.toString()).select("user").get().await().map { it.reference }
-        val deleteAccessFutures = userAccessDocRefs.map { it.delete() }
-        ApiFutures.allAsList(deleteAccessFutures).await()
-        db.users.document(userId.toString()).delete().await()
+        db.asyncConnection {
+            executeUpdate(
+                """
+                DELETE FROM argent_users
+                WHERE id = ?
+                """.trimIndent(),
+                listOf(userId)
+            )
+        }
     }
 }

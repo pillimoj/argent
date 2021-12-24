@@ -6,18 +6,19 @@ TAG := $(subst /,-,$(BRANCH))-$(REVISION)
 # ================= SERVICE ==================
 database:
 	docker-compose up -d	
-	
+
 buildlocalimage:
 	./gradlew jibDockerBuild -PgitHash=${TAG} --info
 
 buildproductionimage:
 	./gradlew jib -PjibImage=${IMAGE} -PgitHash=${TAG} --info
 
-rundocker:
+rundocker: buildlocalimage
 	$(eval IMAGE_DIGEST := $(shell jq -r .image build/jib-image.json)) \
 	docker run -t \
 	--env-file .env \
 	-v ${PWD}/localdockersecrets:/localsecrets \
+	--network argent_network \
 	-p 8008:8008 \
 	${IMAGE_DIGEST}  | node logparse.js
 

@@ -2,7 +2,7 @@
 import argent.data.users.User
 import argent.data.users.UserDataStore
 import argent.data.users.UserRole
-import argent.google.ArgentStore
+import argent.util.database.DataBases
 import io.ktor.auth.Authentication
 import io.ktor.auth.AuthenticationPipeline
 import io.ktor.auth.AuthenticationProvider
@@ -14,7 +14,7 @@ class TestAuthProvider internal constructor(
 ) : AuthenticationProvider(configuration) {
     // internal val confValue: String = configuration.confValue
     init {
-        val usersStore = UserDataStore(ArgentStore())
+        val usersStore = UserDataStore(DataBases.Argent.dbPool)
         runBlocking {
             if (usersStore.getUserForEmail(configuration.user.email) == null) {
                 usersStore.addUser(configuration.user)
