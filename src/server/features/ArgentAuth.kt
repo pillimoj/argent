@@ -57,7 +57,7 @@ fun Authentication.Configuration.argentAuthJwt(
         try {
             val argentToken = call.request.cookies[Config.authentication.cookieName] ?: throw UnauthorizedException()
             val validationResult = ArgentJwt.validateToken(argentToken)
-            namedLogger("argent.server.features.ArgentAuth").info("Request Authenticated", extra("user" to validationResult.user.user.toString()))
+            namedLogger("argent.server.features.ArgentAuth").info("Request Authenticated", extra("user" to validationResult.user.id))
             context.principal(validationResult.user)
             return@intercept
         } catch (e: Exception) {

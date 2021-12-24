@@ -22,7 +22,7 @@ class AdminController(private val userDataStore: UserDataStore) : WithLogger {
 
     val addUser = adminHandler(HttpMethod.Post) {
         val newUser = User.deserialize(call)
-        logger.info("Adding user", extra("userId" to newUser.user))
+        logger.info("Adding user", extra("userId" to newUser.id))
         userDataStore.addUser(newUser)
         call.respondOk()
     }

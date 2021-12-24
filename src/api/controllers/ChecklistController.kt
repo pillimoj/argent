@@ -10,7 +10,6 @@ import argent.data.checklists.ChecklistAccessType
 import argent.data.checklists.ChecklistDataStore
 import argent.data.checklists.ChecklistItem
 import argent.data.users.User
-import argent.data.users.UserAccess
 import argent.data.users.UserDataStore
 import argent.data.users.UserRole
 import argent.server.BadRequestException
@@ -97,34 +96,32 @@ class ChecklistController(
         val share = authedHandler(HttpMethod.Post) { user ->
             val checklistId = pathIdParam()
             val shareRequest = ShareRequest.deserialize(call)
-            logger.info("sharing checklist", extra("checklistId" to checklistId, "shareRequest" to shareRequest))
+            logger.info(
+                "sharing checklist",
+                extra(
+                    "checklistId" to checklistId,
+                    "userToShareWith" to shareRequest.user,
+                    "accessType" to shareRequest.accessType
+                )
+            )
             if (!isOwner(checklistId, user)) {
                 throw ForbiddenException()
             }
-            val userToShareWith =
-                userDataStore.getUser(shareRequest.user) ?: throw BadRequestException("No such user to share with")
-            checklistDataStore.addUserAccess(
-                UserAccess(
-                    checklist = checklistId,
-                    user = shareRequest.user,
-                    name = userToShareWith.name,
-                    checklistAccessType = shareRequest.accessType
-                )
-            )
+            checklistDataStore.addUserAccess(checklistId, shareRequest.user, shareRequest.accessType)
             call.respondOk()
         }
 
         val unShare = authedHandler(HttpMethod.Post) { user ->
             val checklistId = pathIdParam()
             val userId = pathIdParam("userId")
+            if (!isOwner(checklistId, user)) {
+                throw ForbiddenException()
+            }
             logger.info("Un-sharing checklist", extra("userToUnshareWith" to userId))
             val checklistOwners = userDataStore.getUsersForChecklist(checklistId)
                 .filter { it.checklistAccessType == ChecklistAccessType.Owner }
-            if (checklistOwners.size == 1 && checklistOwners.first().user == userId) {
+            if (checklistOwners.size == 1 && checklistOwners.first().id == userId) {
                 throw BadRequestException("Cannot remove last owner of a list")
-            }
-            if (!isOwner(checklistId, user)) {
-                throw ForbiddenException()
             }
             checklistDataStore.removeUserAccess(checklistId, userId)
             call.respondOk()
@@ -147,7 +144,7 @@ class ChecklistController(
             val item = ChecklistItem.deserialize(call)
             logger.info("adding item to checklist", extra("checklistId" to checklistId, "item" to item))
             if (!hasAccess(checklistId, user)) throw ForbiddenException()
-            checklistDataStore.addItem(checklistId, item)
+            checklistDataStore.addItem(item)
             call.respondOk()
         }
 
@@ -159,17 +156,18 @@ class ChecklistController(
         }
 
         private suspend fun setItemStatus(callContext: CallContext, user: User, done: Boolean) {
-            val checklistId = callContext.pathIdParam()
-            val itemId = callContext.pathIdParam("item-id")
-            logger.info(
-                "setting checklist item status",
-                extra("checklistId" to checklistId, "itemId" to itemId, "newStatus" to done)
-            )
-            val item = checklistDataStore.getItem(checklistId, itemId)
-            if (item == null || !hasAccess(checklistId, user)) {
+
+            val id = callContext.pathIdParam()
+            val item = checklistDataStore.getItem(id)
+            if (item == null || !hasAccess(item.checklist, user)) {
                 throw BadRequestException()
             }
-            checklistDataStore.setItemDone(checklistId, itemId, done)
+            logger.info(
+                "setting checklist item status",
+                extra("itemId" to item.id, "newStatus" to done)
+            )
+
+            checklistDataStore.setItemDone(id, done)
             callContext.call.respondOk()
         }
     }

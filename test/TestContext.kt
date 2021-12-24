@@ -1,15 +1,13 @@
 import argent.api.controllers.AdminController
-import argent.api.controllers.ChatController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
 import argent.api.controllers.UsersController
-import argent.data.chat.ChatStore
 import argent.data.checklists.ChecklistDataStore
 import argent.data.game.GameDatastore
 import argent.data.users.User
 import argent.data.users.UserDataStore
-import argent.google.ArgentStore
 import argent.server.mainWithOverrides
+import argent.util.database.DataBases
 import io.ktor.auth.Authentication
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.withTestApplication
@@ -20,13 +18,11 @@ interface ApplicationContext {
     val checklistDataStore: ChecklistDataStore
     val userDataStore: UserDataStore
     val gameDataStore: GameDatastore
-    val chatStore: ChatStore
 
     val checklistController: ChecklistController
     val adminController: AdminController
     val usersController: UsersController
     val gameController: GameController
-    val chatController: ChatController
     val configureAuth: Authentication.Configuration.() -> Unit
     fun <T> testMain(callback: TestApplicationEngine.() -> T): T {
         return withTestApplication({
@@ -35,7 +31,6 @@ interface ApplicationContext {
                 usersController,
                 adminController,
                 gameController,
-                chatController,
                 configureAuth
             )
         }) { callback() }
@@ -43,18 +38,16 @@ interface ApplicationContext {
 }
 
 fun defaultApplicationContext(authenticatedUser: User) = object : ApplicationContext {
-    private val db = ArgentStore()
+    private val db = DataBases.Argent.dbPool
     override val authenticatedUser = authenticatedUser
     override val checklistDataStore = ChecklistDataStore(db)
     override val userDataStore = UserDataStore(db)
     override val gameDataStore = GameDatastore(db)
-    override val chatStore = ChatStore(db)
 
     override val checklistController = ChecklistController(checklistDataStore, userDataStore)
     override val adminController = AdminController(userDataStore)
     override val usersController = UsersController(userDataStore)
     override val gameController = GameController(gameDataStore)
-    override val chatController = ChatController(chatStore)
     override val configureAuth: Authentication.Configuration.() -> Unit = {
         testAuth { user = authenticatedUser }
     }

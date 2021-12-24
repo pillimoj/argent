@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package argent.api
 
 import argent.data.users.User
@@ -28,11 +30,6 @@ fun unAuthedHandler(method: HttpMethod, block: RouteHandler): RouteHandler = {
 fun authedHandler(method: HttpMethod, block: PrincipalHandler): RouteHandler = {
     requireMethod(method)
     val principal = call.principal<User>() ?: throw InternalServerError("No principal in api handler")
-    block(principal)
-}
-
-fun authedWsHandler(block: PrincipalWsHandler): WsHandler = {
-    val principal = call.principal<User>() ?: throw InternalServerError("No principal in api WS handler")
     block(principal)
 }
 

@@ -1,11 +1,12 @@
 plugins {
-    kotlin("jvm") version "1.6.0"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("com.google.cloud.tools.jib") version "3.1.4"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.0"
     application
 }
 
-val ktorVersion = "1.6.5"
+val ktorVersion = "1.6.7"
 val argentMainClass = "argent.MainKt"
 val image = "argent"
 
@@ -29,34 +30,33 @@ dependencies {
     // Ktor
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-jetty:$ktorVersion")
-    implementation("io.ktor:ktor-jackson:$ktorVersion")
+    implementation("io.ktor:ktor-serialization:$ktorVersion")
     implementation("io.ktor:ktor-auth:$ktorVersion")
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-websockets:$ktorVersion")
 
-    // Json
-    implementation("com.fasterxml.jackson.core:jackson-core:2.13.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.0")
-
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.2.3")
-    implementation("net.logstash.logback:logstash-logback-encoder:6.3")
+    implementation("ch.qos.logback:logback-classic:1.2.9")
+    implementation("net.logstash.logback:logstash-logback-encoder:7.0.1")
 
     // Database
-    implementation("com.google.cloud:google-cloud-firestore:3.0.7")
+    implementation("com.zaxxer:HikariCP:5.0.0")
+    implementation("org.postgresql:postgresql:42.3.1")
+    implementation("org.flywaydb:flyway-core:8.2.3")
+
+    // Json
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 
     // Secrets
-    implementation("com.google.cloud:google-cloud-secretmanager:2.0.4")
+    implementation("com.google.cloud:google-cloud-secretmanager:2.0.5")
 
     // JWT
     implementation("com.auth0:java-jwt:3.18.2")
 
     // Tests
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("com.github.javafaker:javafaker:1.0.2")
 }
@@ -69,7 +69,8 @@ tasks {
             events("passed", "skipped", "failed")
         }
     }
-    val run by existing(JavaExec::class) {
+
+    named<JavaExec>("run") {
         getEnvVariables().forEach { environment(it.key, it.value) }
         dependsOn(ktlintFormat)
     }
