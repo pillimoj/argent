@@ -140,10 +140,9 @@ class ChecklistController(
 
     inner class ChecklistItems {
         val create = authedHandler(HttpMethod.Post) { user ->
-            val checklistId = pathIdParam()
             val item = ChecklistItem.deserialize(call)
-            logger.info("adding item to checklist", extra("checklistId" to checklistId, "item" to item))
-            if (!hasAccess(checklistId, user)) throw ForbiddenException()
+            logger.info("adding item to checklist", extra("checklistId" to item.checklist, "item" to item.title))
+            if (!hasAccess(item.checklist, user)) throw ForbiddenException()
             checklistDataStore.addItem(item)
             call.respondOk()
         }
