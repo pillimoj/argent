@@ -1,7 +1,7 @@
 package argent.api.serialization
 
-import io.ktor.application.ApplicationCall
-import io.ktor.request.receive
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.request.receive
 import kotlinx.serialization.Serializable
 
 @Serializable

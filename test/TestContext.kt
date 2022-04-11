@@ -8,9 +8,9 @@ import argent.data.users.User
 import argent.data.users.UserDataStore
 import argent.server.mainWithOverrides
 import argent.util.database.DataBases
-import io.ktor.auth.Authentication
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.withTestApplication
+import io.ktor.server.auth.AuthenticationConfig
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.testApplication
 import kotlinx.coroutines.runBlocking
 
 interface ApplicationContext {
@@ -23,17 +23,22 @@ interface ApplicationContext {
     val adminController: AdminController
     val usersController: UsersController
     val gameController: GameController
-    val configureAuth: Authentication.Configuration.() -> Unit
-    fun <T> testMain(callback: TestApplicationEngine.() -> T): T {
-        return withTestApplication({
-            mainWithOverrides(
-                checklistController,
-                usersController,
-                adminController,
-                gameController,
-                configureAuth
-            )
-        }) { callback() }
+    val configureAuth: AuthenticationConfig.() -> Unit
+    fun <T> testMain(callback: ApplicationTestBuilder.() -> T): T {
+        var result: T? = null
+        testApplication {
+            application {
+                mainWithOverrides(
+                    checklistController,
+                    usersController,
+                    adminController,
+                    gameController,
+                    configureAuth
+                )
+            }
+            result = callback()
+        }
+        return result ?: throw Exception("Test did not produce a result")
     }
 }
 
@@ -48,7 +53,7 @@ fun defaultApplicationContext(authenticatedUser: User) = object : ApplicationCon
     override val adminController = AdminController(userDataStore)
     override val usersController = UsersController(userDataStore)
     override val gameController = GameController(gameDataStore)
-    override val configureAuth: Authentication.Configuration.() -> Unit = {
+    override val configureAuth: AuthenticationConfig.() -> Unit = {
         testAuth { user = authenticatedUser }
     }
 

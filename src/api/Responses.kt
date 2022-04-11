@@ -1,9 +1,9 @@
 package argent.api
 
 import argent.util.argentJson
-import io.ktor.application.ApplicationCall
 import io.ktor.http.ContentType
-import io.ktor.response.respondText
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.response.respondText
 import kotlinx.serialization.Serializable
 
 @Serializable

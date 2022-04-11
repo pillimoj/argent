@@ -3,9 +3,9 @@ import argent.data.users.User
 import argent.data.users.UserDataStore
 import argent.data.users.UserRole
 import argent.util.database.DataBases
-import io.ktor.auth.Authentication
-import io.ktor.auth.AuthenticationPipeline
-import io.ktor.auth.AuthenticationProvider
+import io.ktor.server.auth.AuthenticationConfig
+import io.ktor.server.auth.AuthenticationContext
+import io.ktor.server.auth.AuthenticationProvider
 import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
@@ -22,27 +22,27 @@ class TestAuthProvider internal constructor(
         }
     }
 
-    val user = configuration.user
+    private val user = configuration.user
 
-    class Configuration internal constructor(name: String?) : AuthenticationProvider.Configuration(name) {
+    class Configuration internal constructor(name: String?) : AuthenticationProvider.Config(name) {
         lateinit var user: User
+    }
+
+    override suspend fun onAuthenticate(context: AuthenticationContext) {
+        context.principal(user)
     }
 }
 
-fun Authentication.Configuration.testAuth(
+fun AuthenticationConfig.testAuth(
     name: String? = null,
     configure: TestAuthProvider.Configuration.() -> Unit
 ) {
     val provider = TestAuthProvider(TestAuthProvider.Configuration(name).apply(configure))
-    provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
-        context.principal(provider.user)
-        return@intercept
-    }
     register(provider)
 }
 
 val TestAuthDefaultUser = User(
-    user = UUID.fromString("61585D32-69EF-4F4F-9A9B-B37EFCECE870"),
+    id = UUID.fromString("61585D32-69EF-4F4F-9A9B-B37EFCECE870"),
     name = "TestUserName",
     email = "test@argent.grimsborn.com",
     role = UserRole.User,

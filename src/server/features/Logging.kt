@@ -1,12 +1,12 @@
 package argent.server.features
 
-import io.ktor.application.Application
-import io.ktor.application.install
-import io.ktor.features.CallId
-import io.ktor.features.CallLogging
-import io.ktor.features.callIdMdc
 import io.ktor.http.HttpHeaders
-import io.ktor.request.header
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.plugins.callid.CallId
+import io.ktor.server.plugins.callid.callIdMdc
+import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.request.header
 import org.slf4j.event.Level
 import java.util.UUID
 

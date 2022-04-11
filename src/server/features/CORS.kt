@@ -1,21 +1,21 @@
 package argent.server.features
 
-import io.ktor.features.CORS
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.server.plugins.cors.CORSConfig
 
-fun CORS.Configuration.configure() {
-    method(HttpMethod.Options)
-    method(HttpMethod.Post)
-    method(HttpMethod.Patch)
-    method(HttpMethod.Put)
-    method(HttpMethod.Delete)
-    header("X-Requested-With")
-    header(HttpHeaders.XForwardedProto)
-    header("X-Request-ID")
-    header(HttpHeaders.Authorization)
-    host("localhost:5000")
-    host("argent.grimsborn.com", schemes = listOf("https"))
+fun CORSConfig.configureCORS() {
+    allowMethod(HttpMethod.Options)
+    allowMethod(HttpMethod.Post)
+    allowMethod(HttpMethod.Patch)
+    allowMethod(HttpMethod.Put)
+    allowMethod(HttpMethod.Delete)
+    allowHeader("X-Requested-With")
+    allowHeader(HttpHeaders.XForwardedProto)
+    allowHeader("X-Request-ID")
+    allowHeader(HttpHeaders.Authorization)
+    allowHost("localhost:5000")
+    allowHost("argent.grimsborn.com", schemes = listOf("https"))
     allowCredentials = true
     allowNonSimpleContentTypes = true
     exposeHeader("X-Request-ID")

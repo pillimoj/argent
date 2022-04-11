@@ -7,20 +7,17 @@ import argent.data.users.UserRole
 import argent.server.ForbiddenException
 import argent.server.InternalServerError
 import argent.util.requireMethod
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.auth.principal
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.call
+import io.ktor.server.auth.principal
+import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineContext
-import io.ktor.websocket.DefaultWebSocketServerSession
 
 typealias CallContext = PipelineContext<Unit, ApplicationCall>
 typealias RouteHandler = suspend CallContext.(Unit) -> Unit
 typealias PrincipalHandler = suspend CallContext.(User) -> Unit
-typealias WsHandler = suspend DefaultWebSocketServerSession.() -> Unit
-typealias PrincipalWsHandler = suspend DefaultWebSocketServerSession.(User) -> Unit
 
 fun unAuthedHandler(method: HttpMethod, block: RouteHandler): RouteHandler = {
     requireMethod(method)

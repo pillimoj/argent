@@ -6,7 +6,7 @@ import argent.data.checklists.ChecklistAccessType
 import argent.util.UUIDSerializer
 import argent.util.asEnum
 import argent.util.database.getUUID
-import io.ktor.auth.Principal
+import io.ktor.server.auth.Principal
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.sql.ResultSet

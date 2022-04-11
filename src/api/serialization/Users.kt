@@ -6,8 +6,8 @@ import argent.data.checklists.ChecklistAccessType
 import argent.data.users.User
 import argent.data.users.UserRole
 import argent.util.UUIDSerializer
-import io.ktor.application.ApplicationCall
-import io.ktor.request.receive
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.request.receive
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.util.UUID

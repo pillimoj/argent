@@ -4,7 +4,7 @@ import argent.server.Config
 import argent.server.main
 import argent.util.database.DataBases
 import argent.util.database.runMigrations
-import io.ktor.application.Application
+import io.ktor.server.application.Application
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 
