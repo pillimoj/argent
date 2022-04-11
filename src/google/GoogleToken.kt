@@ -1,9 +1,9 @@
 package argent.google
 
 import argent.util.argentJson
-import io.ktor.application.ApplicationCall
 import io.ktor.http.HttpHeaders
-import io.ktor.request.header
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.request.header
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -19,9 +19,9 @@ import argent.util.WithLogger
 import argent.util.extra
 import argent.util.logger
 import argent.util.pathIdParam
-import io.ktor.application.call
 import io.ktor.http.HttpMethod
-import io.ktor.response.respond
+import io.ktor.server.application.call
+import io.ktor.server.response.respond
 import java.util.UUID
 
 class ChecklistController(

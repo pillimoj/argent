@@ -14,9 +14,9 @@ import argent.server.features.createAuthCookie
 import argent.server.features.createExpiredCookie
 import argent.util.WithLogger
 import argent.util.logger
-import io.ktor.application.call
 import io.ktor.http.HttpMethod
-import io.ktor.response.respond
+import io.ktor.server.application.call
+import io.ktor.server.response.respond
 
 class UsersController(private val userDataStore: UserDataStore) : WithLogger {
     val me = authedHandler(HttpMethod.Get) { user ->

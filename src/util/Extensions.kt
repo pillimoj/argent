@@ -2,10 +2,10 @@ package argent.util
 
 import argent.server.MethodNotAllowedException
 import argent.server.NotFoundException
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
 import io.ktor.http.HttpMethod
-import io.ktor.request.httpMethod
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.call
+import io.ktor.server.request.httpMethod
 import io.ktor.util.date.GMTDate
 import io.ktor.util.date.toJvmDate
 import io.ktor.util.pipeline.PipelineContext

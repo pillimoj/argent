@@ -10,28 +10,26 @@ import argent.data.checklists.ChecklistDataStore
 import argent.data.game.GameDatastore
 import argent.data.users.UserDataStore
 import argent.server.features.argentAuthJwt
-import argent.server.features.configure
+import argent.server.features.configureCORS
+import argent.server.features.configureStatusPages
 import argent.server.features.installCallLogging
 import argent.util.argentJson
 import argent.util.database.DataBases
-import io.ktor.application.Application
-import io.ktor.application.install
-import io.ktor.auth.Authentication
-import io.ktor.features.CORS
-import io.ktor.features.Compression
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.HSTS
-import io.ktor.features.StatusPages
-import io.ktor.features.XForwardedHeaderSupport
-import io.ktor.features.gzip
-import io.ktor.http.cio.websocket.pingPeriod
-import io.ktor.http.cio.websocket.timeout
-import io.ktor.routing.get
-import io.ktor.routing.route
-import io.ktor.routing.routing
-import io.ktor.serialization.json
-import io.ktor.websocket.WebSockets
-import java.time.Duration
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.AuthenticationConfig
+import io.ktor.server.plugins.compression.Compression
+import io.ktor.server.plugins.compression.gzip
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.CORS
+import io.ktor.server.plugins.forwardedheaders.ForwardedHeaders
+import io.ktor.server.plugins.hsts.HSTS
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 
 fun Application.main() {
     val userDataStore = UserDataStore(DataBases.Argent.dbPool)
@@ -43,7 +41,7 @@ fun Application.main() {
     val usersController = UsersController(userDataStore)
     val gameController = GameController(gameDataStore)
 
-    val configureAuth: Authentication.Configuration.() -> Unit = { argentAuthJwt { } }
+    val configureAuth: AuthenticationConfig.() -> Unit = { argentAuthJwt { } }
 
     mainWithOverrides(
         checklistController,
@@ -59,22 +57,16 @@ fun Application.mainWithOverrides(
     usersController: UsersController,
     adminController: AdminController,
     gameController: GameController,
-    configureAuth: Authentication.Configuration.() -> Unit
+    configureAuth: AuthenticationConfig.() -> Unit
 ) {
     installCallLogging()
     install(ContentNegotiation) { json(argentJson) }
-    install(Compression) { gzip() }
-    install(XForwardedHeaderSupport)
+    install(Compression) { gzip { } }
+    install(ForwardedHeaders)
     install(HSTS)
-    install(CORS) { configure() }
-    install(StatusPages) { configure() }
+    install(CORS) { configureCORS() }
+    install(StatusPages) { configureStatusPages() }
     install(Authentication) { configureAuth() }
-    install(WebSockets) {
-        pingPeriod = Duration.ofSeconds(15)
-        timeout = Duration.ofSeconds(15)
-        maxFrameSize = Long.MAX_VALUE
-        masking = false
-    }
 
     routing {
         get("/ping", UtilController.ping)

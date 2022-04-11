@@ -61,7 +61,7 @@ object Config {
     val port = getConfig("PORT", "8080").toInt()
     private val debug = getConfig("ARGENT_DEBUG", "false") == "true"
 
-    val googleProject = getConfig("GOOGLE_CLOUD_PROJECT")
+    val googleProject = getConfig("GOOGLE_CLOUD_PROJECT", "")
 
     val authentication: AuthConf by lazy {
         if (debug) getDevConf("argent-authentication", AuthConf.serializer())
