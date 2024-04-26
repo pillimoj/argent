@@ -4,16 +4,20 @@ import ApplicationTest
 import TestAuthDefaultUser
 import argent.data.users.User
 import org.junit.BeforeClass
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class ChecklistItemsTest : ApplicationTest {
     override val authenticatedUser: User = TestAuthDefaultUser
 
-    @BeforeClass
-    fun setUp() {
-    }
-
     @Test
-    fun seedDatabase() = testApp {
+    fun seedDatabase() =
+        testApp {
+        }
+
+    companion object {
+        @JvmStatic
+        @BeforeClass
+        fun setUp() {
+        }
     }
 }

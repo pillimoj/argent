@@ -15,9 +15,10 @@ private const val MINUTE_MILLIS = 60L * 1000
 private const val issuer = "argent"
 private fun dateInFutureMinutes(minutesInFuture: Int): Date {
     val result = Date()
-    result.time = result.time + minutesInFuture * MINUTE_MILLIS
+    result.time += minutesInFuture * MINUTE_MILLIS
     return result
 }
+
 object ArgentJwt {
     private val algorithm = Algorithm.HMAC256(Config.authentication.jwtKey)
     private val verifier = JWT.require(algorithm)

@@ -1,5 +1,3 @@
-@file:Suppress("unused", "unused", "unused", "unused", "unused", "unused")
-
 package argent.server
 
 import argent.data.users.User

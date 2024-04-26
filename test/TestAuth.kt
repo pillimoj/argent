@@ -10,7 +10,7 @@ import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
 class TestAuthProvider internal constructor(
-    configuration: Configuration
+    configuration: Configuration,
 ) : AuthenticationProvider(configuration) {
     // internal val confValue: String = configuration.confValue
     init {
@@ -35,15 +35,16 @@ class TestAuthProvider internal constructor(
 
 fun AuthenticationConfig.testAuth(
     name: String? = null,
-    configure: TestAuthProvider.Configuration.() -> Unit
+    configure: TestAuthProvider.Configuration.() -> Unit,
 ) {
     val provider = TestAuthProvider(TestAuthProvider.Configuration(name).apply(configure))
     register(provider)
 }
 
-val TestAuthDefaultUser = User(
-    id = UUID.fromString("61585D32-69EF-4F4F-9A9B-B37EFCECE870"),
-    name = "TestUserName",
-    email = "test@argent.grimsborn.com",
-    role = UserRole.User,
-)
+val TestAuthDefaultUser =
+    User(
+        id = UUID.fromString("61585D32-69EF-4F4F-9A9B-B37EFCECE870"),
+        name = "TestUserName",
+        email = "test@argent.grimsborn.com",
+        role = UserRole.User,
+    )
