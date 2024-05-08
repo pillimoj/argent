@@ -22,5 +22,5 @@ fun main() {
                 responseWriteTimeoutSeconds = 30
             },
         )
-    server.start()
+    server.start(wait = true)
 }

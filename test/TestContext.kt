@@ -24,6 +24,7 @@ interface ApplicationContext {
     val usersController: UsersController
     val gameController: GameController
     val configureAuth: AuthenticationConfig.() -> Unit
+
     fun <T> testMain(callback: ApplicationTestBuilder.() -> T): T {
         var result: T? = null
         testApplication {
@@ -33,7 +34,7 @@ interface ApplicationContext {
                     usersController,
                     adminController,
                     gameController,
-                    configureAuth
+                    configureAuth,
                 )
             }
             result = callback()
@@ -42,42 +43,44 @@ interface ApplicationContext {
     }
 }
 
-fun defaultApplicationContext(authenticatedUser: User) = object : ApplicationContext {
-    private val db = DataBases.Argent.dbPool
-    override val authenticatedUser = authenticatedUser
-    override val checklistDataStore = ChecklistDataStore(db)
-    override val userDataStore = UserDataStore(db)
-    override val gameDataStore = GameDatastore(db)
+fun defaultApplicationContext(authenticatedUser: User) =
+    object : ApplicationContext {
+        private val db = DataBases.Argent.dbPool
+        override val authenticatedUser = authenticatedUser
+        override val checklistDataStore = ChecklistDataStore(db)
+        override val userDataStore = UserDataStore(db)
+        override val gameDataStore = GameDatastore(db)
 
-    override val checklistController = ChecklistController(checklistDataStore, userDataStore)
-    override val adminController = AdminController(userDataStore)
-    override val usersController = UsersController(userDataStore)
-    override val gameController = GameController(gameDataStore)
-    override val configureAuth: AuthenticationConfig.() -> Unit = {
-        testAuth { user = authenticatedUser }
-    }
+        override val checklistController = ChecklistController(checklistDataStore, userDataStore)
+        override val adminController = AdminController(userDataStore)
+        override val usersController = UsersController(userDataStore)
+        override val gameController = GameController(gameDataStore)
+        override val configureAuth: AuthenticationConfig.() -> Unit = {
+            testAuth { user = authenticatedUser }
+        }
 
-    init {
-        runBlocking {
-            if (null == userDataStore.getUserForEmail(authenticatedUser.email)) {
-                userDataStore.addUser(authenticatedUser)
+        init {
+            runBlocking {
+                if (null == userDataStore.getUserForEmail(authenticatedUser.email)) {
+                    userDataStore.addUser(authenticatedUser)
+                }
             }
         }
     }
-}
 
 interface ApplicationTest {
     val authenticatedUser: User
+
     fun <T : Any> withAppContext(
         context: ApplicationContext = defaultApplicationContext(authenticatedUser),
-        block: suspend ApplicationContext.() -> T
+        block: suspend ApplicationContext.() -> T,
     ): T {
         return runBlocking { context.run { block() } }
     }
 
     fun <T> testApp(
         context: ApplicationContext = defaultApplicationContext(authenticatedUser),
-        block: suspend ApplicationContext.() -> T
+        block: suspend ApplicationContext.() -> T,
     ) {
         runBlocking { context.run { block() } }
     }

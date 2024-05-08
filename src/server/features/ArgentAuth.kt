@@ -8,7 +8,6 @@ import argent.util.extra
 import argent.util.namedLogger
 import com.auth0.jwt.exceptions.JWTVerificationException
 import io.ktor.http.Cookie
-import io.ktor.server.application.call
 import io.ktor.server.auth.AuthenticationConfig
 import io.ktor.server.auth.AuthenticationContext
 import io.ktor.server.auth.AuthenticationProvider

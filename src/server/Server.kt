@@ -23,7 +23,7 @@ import io.ktor.server.auth.AuthenticationConfig
 import io.ktor.server.plugins.compression.Compression
 import io.ktor.server.plugins.compression.gzip
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.plugins.cors.CORS
+import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.forwardedheaders.ForwardedHeaders
 import io.ktor.server.plugins.hsts.HSTS
 import io.ktor.server.plugins.statuspages.StatusPages
