@@ -1,11 +1,13 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
 
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "2.0.0"
     id("io.ktor.plugin") version "2.3.9"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.23"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
     id("com.google.cloud.tools.jib") version "3.4.1"
     application
 }
@@ -17,13 +19,20 @@ val image = "argent"
 group = "Argent"
 version = "1.0-SNAPSHOT"
 
-kotlin.sourceSets {
-    main { kotlin.srcDir("src") }
-    test { kotlin.srcDir("test") }
-}
-sourceSets {
-    main { resources.srcDir("resources") }
-    test { resources.srcDir("testresources") }
+kotlin {
+    sourceSets {
+        main {
+            kotlin.srcDir("src")
+            resources.srcDir("resources")
+        }
+        test {
+            kotlin.srcDir("test")
+            resources.srcDir("testresources")
+        }
+    }
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_22)
+    }
 }
 
 repositories {
@@ -31,7 +40,6 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
 
     // Ktor
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
@@ -60,7 +68,7 @@ dependencies {
     implementation("com.google.cloud.sql:postgres-socket-factory:1.17.1")
 
     // Json
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Secrets
     implementation("com.google.cloud:google-cloud-secretmanager:2.38.0")
@@ -85,12 +93,6 @@ tasks {
         getEnvVariables().forEach { environment(it.key, it.value) }
     }
 
-    compileKotlin {
-        kotlinOptions.jvmTarget = "17"
-    }
-    compileJava {
-        this.targetCompatibility = "17"
-    }
 }
 
 // PLUGINS
@@ -100,7 +102,7 @@ application {
 }
 
 jib {
-    from.image = "gcr.io/distroless/java17-debian12"
+    from.image = "gcr.io/distroless/java21-debian12"
     container {
         ports = listOf("80")
         mainClass = argentMainClass
