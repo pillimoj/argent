@@ -56,7 +56,7 @@ dependencies {
     implementation("io.ktor:ktor-server-forwarded-header")
     implementation("io.ktor:ktor-server-hsts")
     implementation("io.ktor:ktor-server-status-pages")
-
+    implementation("io.ktor:ktor-server-websockets")
     // Logging
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("net.logstash.logback:logstash-logback-encoder:7.4")
