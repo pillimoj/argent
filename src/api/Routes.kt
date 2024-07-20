@@ -3,6 +3,7 @@ package argent.api
 import argent.api.controllers.AdminController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
+import argent.api.controllers.GceVmController
 import argent.api.controllers.UsersController
 import io.ktor.server.auth.authenticate
 import io.ktor.server.routing.Route
@@ -16,6 +17,7 @@ fun Route.v1Routes(
     usersController: UsersController,
     adminController: AdminController,
     gameController: GameController,
+    gceVmController: GceVmController
 ) {
     authenticate {
         get("me", usersController.me)
@@ -52,6 +54,13 @@ fun Route.v1Routes(
             post("set-highest-cleared", gameController.setHighestCleared)
         }
     } // end authenticate
+    //TODO: Authenticate VM access
+    route("gce-vm"){
+      get(gceVmController.status)
+        post("start", gceVmController.start)
+        post("stop", gceVmController.stop)
+    }
+
     get("login", usersController.login)
     get("logout", usersController.logout)
 }

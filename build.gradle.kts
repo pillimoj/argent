@@ -42,20 +42,26 @@ repositories {
 dependencies {
 
     // Ktor
-    implementation("io.ktor:ktor-server-content-negotiation-jvm")
-    implementation("io.ktor:ktor-server-core-jvm")
-    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
-    implementation("io.ktor:ktor-server-auth-jvm")
-    implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.ktor:ktor-serialization-kotlinx-json")
+
+    // Ktor server
+    implementation("io.ktor:ktor-server-core")
+    implementation("io.ktor:ktor-server-content-negotiation")
+    implementation("io.ktor:ktor-server-auth")
+    implementation("io.ktor:ktor-server-netty")
     implementation("io.ktor:ktor-server-auth-jwt")
     implementation("io.ktor:ktor-server-call-id")
     implementation("io.ktor:ktor-server-call-logging")
     implementation("io.ktor:ktor-server-compression")
-    implementation("io.ktor:ktor-server-content-negotiation")
     implementation("io.ktor:ktor-server-cors")
     implementation("io.ktor:ktor-server-forwarded-header")
     implementation("io.ktor:ktor-server-hsts")
     implementation("io.ktor:ktor-server-status-pages")
+
+    // Ktor client
+    implementation("io.ktor:ktor-client-core")
+    implementation("io.ktor:ktor-client-cio")
+    implementation("io.ktor:ktor-client-content-negotiation")
 
     // Logging
     implementation("ch.qos.logback:logback-classic:$logback_version")
@@ -65,13 +71,14 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.postgresql:postgresql:42.7.3")
     implementation("org.flywaydb:flyway-core:8.5.4")
-    implementation("com.google.cloud.sql:postgres-socket-factory:1.17.1")
+    implementation("com.google.cloud.sql:postgres-socket-factory:1.19.0")
 
     // Json
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
-    // Secrets
-    implementation("com.google.cloud:google-cloud-secretmanager:2.38.0")
+    // Google
+    implementation(platform("com.google.cloud:libraries-bom:26.42.0"))
+    implementation("com.google.cloud:google-cloud-secretmanager")
 
     // JWT
     implementation("com.auth0:java-jwt:3.19.1")

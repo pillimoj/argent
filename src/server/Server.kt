@@ -3,6 +3,7 @@ package argent.server
 import argent.api.controllers.AdminController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
+import argent.api.controllers.GceVmController
 import argent.api.controllers.UsersController
 import argent.api.controllers.UtilController
 import argent.api.v1Routes
@@ -40,6 +41,7 @@ fun Application.main() {
     val checklistController = ChecklistController(checklistDataStore, userDataStore)
     val usersController = UsersController(userDataStore)
     val gameController = GameController(gameDataStore)
+    val gceVmController = GceVmController()
 
     val configureAuth: AuthenticationConfig.() -> Unit = { argentAuthJwt { } }
 
@@ -48,6 +50,7 @@ fun Application.main() {
         usersController,
         adminController,
         gameController,
+        gceVmController,
         configureAuth
     )
 }
@@ -57,6 +60,7 @@ fun Application.mainWithOverrides(
     usersController: UsersController,
     adminController: AdminController,
     gameController: GameController,
+    gceVmController: GceVmController,
     configureAuth: AuthenticationConfig.() -> Unit
 ) {
     installCallLogging()
@@ -77,6 +81,7 @@ fun Application.mainWithOverrides(
                 usersController,
                 adminController,
                 gameController,
+                gceVmController
             )
         }
     }

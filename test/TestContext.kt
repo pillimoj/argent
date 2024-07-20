@@ -1,6 +1,7 @@
 import argent.api.controllers.AdminController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
+import argent.api.controllers.GceVmController
 import argent.api.controllers.UsersController
 import argent.data.checklists.ChecklistDataStore
 import argent.data.game.GameDatastore
@@ -23,6 +24,7 @@ interface ApplicationContext {
     val adminController: AdminController
     val usersController: UsersController
     val gameController: GameController
+    val gceVmController: GceVmController
     val configureAuth: AuthenticationConfig.() -> Unit
 
     fun <T> testMain(callback: ApplicationTestBuilder.() -> T): T {
@@ -34,6 +36,7 @@ interface ApplicationContext {
                     usersController,
                     adminController,
                     gameController,
+                    gceVmController,
                     configureAuth,
                 )
             }
@@ -55,6 +58,7 @@ fun defaultApplicationContext(authenticatedUser: User) =
         override val adminController = AdminController(userDataStore)
         override val usersController = UsersController(userDataStore)
         override val gameController = GameController(gameDataStore)
+        override val gceVmController = GceVmController()
         override val configureAuth: AuthenticationConfig.() -> Unit = {
             testAuth { user = authenticatedUser }
         }
