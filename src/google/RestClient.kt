@@ -20,7 +20,7 @@ object RestClient {
     private var token: String? = null
     private var expiration: Instant = Instant.MIN
 
-    val client = HttpClient(CIO) {
+    fun createClient() = HttpClient(CIO) {
         install(ContentNegotiation) {
             json(argentJson)
         }
@@ -43,8 +43,8 @@ object RestClient {
     }
 
     private suspend fun refreshToken(): TokenResponse? {
+        val client = createClient()
         val result = runCatching {
-            val client = HttpClient(CIO)
             client.get("http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token") {
                 headers["Metadata-Flavor"] = "Google"
             }

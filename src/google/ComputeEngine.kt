@@ -31,24 +31,26 @@ object MyGceInstance {
     private val conf = Config.gceConf
     private val url = ComputeEngine.getUrl(conf.project, conf.zone, conf.instance)
     suspend fun getStatus(): GceInstance? {
-        val result = runCatching {
-            val response = RestClient.client.get(url) {
+        return RestClient.createClient().use {
+            it.get(url) {
                 gcpBearerAuth()
-            }
-            response.body<GceInstance>()
+            }.body<GceInstance>()
         }
-        return result.getOrNull()
     }
 
     suspend fun startInstance() {
-        RestClient.client.post("$url/start") {
-            gcpBearerAuth()
+        RestClient.createClient().use {
+            it.post("$url/start") {
+                gcpBearerAuth()
+            }
         }
     }
 
     suspend fun stopInstance() {
-        RestClient.client.post("$url/stop") {
-            gcpBearerAuth()
+        RestClient.createClient().use {
+            it.post("$url/stop") {
+                gcpBearerAuth()
+            }
         }
     }
 }
