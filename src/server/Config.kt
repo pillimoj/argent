@@ -39,6 +39,13 @@ data class AuthConf(
     val cookieName: String,
 )
 
+@Serializable
+data class GceConf(
+    val project: String,
+    val zone: String,
+    val instance: String,
+)
+
 fun getConfig(configKey: String, default: String? = null): String {
     val strValue = System.getenv(configKey)
     return strValue ?: default ?: throw ConfigurationError("Missing configuration $configKey")
@@ -57,7 +64,7 @@ inline fun <reified T> getDevConf(name: String, serializer: DeserializationStrat
 
 object Config {
     val port = getConfig("PORT", "8080").toInt()
-    private val debug = getConfig("ARGENT_DEBUG", "false") == "true"
+    val debug = getConfig("ARGENT_DEBUG", "false") == "true"
 
     val googleProject = getConfig("GOOGLE_CLOUD_PROJECT", "")
 
@@ -70,6 +77,13 @@ object Config {
         if (debug) getDevConf("argent-db", DbConf.serializer())
         else getSecretConf("argent-db", DbConf.serializer())
     }
+
+    val gceConf: GceConf by lazy {
+        if (debug) getDevConf("argent-gce-vm-conf", GceConf.serializer())
+        else getSecretConf("argent-gce-vm-conf", GceConf.serializer())
+    }
+
+    val gcpRestTokenOverride: String? = getConfig("GCP_REST_TOKEN_OVERRIDE", "").ifBlank { null }
 
     fun initDevAdmin() {
         if (!debug) return
