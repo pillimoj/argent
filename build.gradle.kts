@@ -20,6 +20,7 @@ group = "Argent"
 version = "1.0-SNAPSHOT"
 
 kotlin {
+    jvmToolchain(21)
     sourceSets {
         main {
             kotlin.srcDir("src")
@@ -29,9 +30,6 @@ kotlin {
             kotlin.srcDir("test")
             resources.srcDir("testresources")
         }
-    }
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_22)
     }
 }
 
