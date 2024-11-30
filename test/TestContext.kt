@@ -2,9 +2,11 @@ import argent.api.controllers.AdminController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
 import argent.api.controllers.GceVmController
+import argent.api.controllers.MtgController
 import argent.api.controllers.UsersController
 import argent.data.checklists.ChecklistDataStore
 import argent.data.game.GameDatastore
+import argent.data.mtg.MtgDataStore
 import argent.data.users.User
 import argent.data.users.UserDataStore
 import argent.server.mainWithOverrides
@@ -19,12 +21,14 @@ interface ApplicationContext {
     val checklistDataStore: ChecklistDataStore
     val userDataStore: UserDataStore
     val gameDataStore: GameDatastore
+    val mtgDataStore: MtgDataStore
 
     val checklistController: ChecklistController
     val adminController: AdminController
     val usersController: UsersController
     val gameController: GameController
     val gceVmController: GceVmController
+    val mtgController: MtgController
     val configureAuth: AuthenticationConfig.() -> Unit
 
     fun <T> testMain(callback: ApplicationTestBuilder.() -> T): T {
@@ -37,6 +41,7 @@ interface ApplicationContext {
                     adminController,
                     gameController,
                     gceVmController,
+                    mtgController,
                     configureAuth,
                 )
             }
@@ -53,12 +58,14 @@ fun defaultApplicationContext(authenticatedUser: User) =
         override val checklistDataStore = ChecklistDataStore(db)
         override val userDataStore = UserDataStore(db)
         override val gameDataStore = GameDatastore(db)
+        override val mtgDataStore = MtgDataStore(db)
 
         override val checklistController = ChecklistController(checklistDataStore, userDataStore)
         override val adminController = AdminController(userDataStore)
         override val usersController = UsersController(userDataStore)
         override val gameController = GameController(gameDataStore)
         override val gceVmController = GceVmController()
+        override val mtgController = MtgController(mtgDataStore)
         override val configureAuth: AuthenticationConfig.() -> Unit = {
             testAuth { user = authenticatedUser }
         }
