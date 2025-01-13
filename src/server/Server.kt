@@ -4,13 +4,11 @@ import argent.api.controllers.AdminController
 import argent.api.controllers.ChecklistController
 import argent.api.controllers.GameController
 import argent.api.controllers.GceVmController
-import argent.api.controllers.MtgController
 import argent.api.controllers.UsersController
 import argent.api.controllers.UtilController
 import argent.api.v1Routes
 import argent.data.checklists.ChecklistDataStore
 import argent.data.game.GameDatastore
-import argent.data.mtg.MtgDataStore
 import argent.data.users.UserDataStore
 import argent.server.features.argentAuthJwt
 import argent.server.features.configureCORS
@@ -38,14 +36,12 @@ fun Application.main() {
     val userDataStore = UserDataStore(DataBases.Argent.dbPool)
     val checklistDataStore = ChecklistDataStore(DataBases.Argent.dbPool)
     val gameDataStore = GameDatastore(DataBases.Argent.dbPool)
-    val mtgStore = MtgDataStore(DataBases.Argent.dbPool)
 
     val adminController = AdminController(userDataStore)
     val checklistController = ChecklistController(checklistDataStore, userDataStore)
     val usersController = UsersController(userDataStore)
     val gameController = GameController(gameDataStore)
     val gceVmController = GceVmController()
-    val mtgController = MtgController(mtgStore)
 
     val configureAuth: AuthenticationConfig.() -> Unit = { argentAuthJwt { } }
 
@@ -55,7 +51,6 @@ fun Application.main() {
         adminController,
         gameController,
         gceVmController,
-        mtgController,
         configureAuth
     )
 }
@@ -66,7 +61,6 @@ fun Application.mainWithOverrides(
     adminController: AdminController,
     gameController: GameController,
     gceVmController: GceVmController,
-    mtgController: MtgController,
     configureAuth: AuthenticationConfig.() -> Unit
 ) {
     installCallLogging()
@@ -87,8 +81,7 @@ fun Application.mainWithOverrides(
                 usersController,
                 adminController,
                 gameController,
-                gceVmController,
-                mtgController
+                gceVmController
             )
         }
     }
